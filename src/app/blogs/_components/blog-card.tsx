@@ -22,7 +22,7 @@ export default async function BlogCard() {
           href={`/blogs/${blog.slug}`}
           className="group block"
         >
-          <Card className="flex h-full cursor-pointer py-4 flex-col justify-between border border-border transition-all duration-300 hover:scale-[1.01] hover:border-neutral-400">
+          <Card className="flex h-full cursor-pointer py-4 flex-col justify-between border transition-all duration-300 hover:scale-[1.01] hover:border-neutral-400">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="space-y-2">

@@ -23,8 +23,8 @@ Here you can see that the image shifted the layout of the page. However, if we u
 
 For static images it is pretty state forward,
 
-<CodeBlock language="jsx" showLineNumbers>
-{`import Image from "next/image";
+```jsx showLineNumbers
+import Image from "next/image";
   import img from "../../../public/image.jpg";
 
   export default function Static() {
@@ -39,8 +39,8 @@ For static images it is pretty state forward,
         />
       </>
     );
-  }`}
-</CodeBlock>
+  }
+```
 
 As you can see just by adding `placeholder="blur"` we can achieve the blur effect. Here NextJs / Vercel does all the heavy lifting for turning the static image into a blurred image and uses this blurred image as a placeholder. Here `placeholder="blur"` in action.
 ![static-gif.gif](/content/blogs/best-way-to-load-images-in-nextjs/data/static-gif.gif)
@@ -54,8 +54,8 @@ As you can probably tell using placeholders for dynamic images can be tricky bec
 
 To address this we can generate the blur base64 image of the fetched image using a library called [`plaiceholder`](https://plaiceholder.co/docs). `Plaiceholder` is a server-side function for creating low-quality image placeholders. To use `plaiceholder` we need to install `sharp` and `plaiceholder`. Some frameworks include `sharp` by default so check before installing the library. Here is the straightforward code to turn the actual image into its base64 version
 
-<CodeBlock language="ts" showLineNumbers>
-{`import axios from "axios";
+```ts showLineNumbers
+import axios from "axios";
   import { getPlaiceholder } from "plaiceholder";
 
   async function generateBlurImg(image_url: string) {
@@ -69,13 +69,13 @@ To address this we can generate the blur base64 image of the fetched image using
       if (e instanceof Error) console.log(e.stack);
     }
   }
-  export default generateBlurImg;`}
-</CodeBlock>
+  export default generateBlurImg;
+```
 
 First we need to fetch the image as an [arrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) . Then we pass the data to the `getPlaiceholder` function from the `plaiceholder` library and we get the base64 version of the image.
 
-<CodeBlock language="tsx" showLineNumbers>
-{`import Image from "next/image";
+```tsx showLineNumbers
+import Image from "next/image";
   import generateBlurImg from "../utils/generateBlurImg";
 
   export default async function Dynamic() {
@@ -93,8 +93,8 @@ First we need to fetch the image as an [arrayBuffer](https://developer.mozilla.o
         />
       </>
     );
-  }`}
-</CodeBlock>
+  }
+```
 
 Then we pass the blur image to `blurDataURL` here passing the base64 version is necessary.
 
@@ -104,8 +104,8 @@ This code works because we are using server component of NextJs. If the componen
 
 We can turn any image to its base64 form and store it locally and use it as our blur image data. For example take any image and turn it into base64 version then use it in `blurDataURL` This will also work.
 
-<CodeBlock language="tsx" showLineNumbers>
-{`import Image from "next/image";
+```tsx showLineNumbers
+import Image from "next/image";
   import blurImgJSON from "../customBase64Img.json";
 
   export default async function Dynamic() {
@@ -121,8 +121,8 @@ We can turn any image to its base64 form and store it locally and use it as our 
         />
       </>
     );
-  }`}
-</CodeBlock>
+  }
+```
 
 Here I am storing my blur image's base64 form in a json and loading it from there. Making a generic blur base64 which can be used throughout the application can be useful if you don't want to generate any blur images.
 
@@ -130,8 +130,8 @@ Here I am storing my blur image's base64 form in a json and loading it from ther
 
 And If you just don't care use a solid background as a placeholder. You can use any gradient also.
 
-<CodeBlock language="tsx" showLineNumbers>
-{`import Image from "next/image";
+```tsx showLineNumbers
+import Image from "next/image";
   import generateBlurImg from "../utils/generateBlurImg";
 
   export default async function Dynamic() {
@@ -148,6 +148,7 @@ And If you just don't care use a solid background as a placeholder. You can use 
         />
       </>
     );
-  }`}
-</CodeBlock>
+  }
+```
+
 [Source Code](https://github.com/Iftekhar-Ifat/loading-images-nextjs)

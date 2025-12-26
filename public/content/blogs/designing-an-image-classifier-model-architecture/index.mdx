@@ -23,15 +23,15 @@ Before diving in, make sure you have a basic understanding of:
 For our example, we will be using the CIFAR-10 dataset, which consists of 60,000 (32x32) color images in 10 classes, with 6,000 images per class.
 
 <div className='flex justify-center'>
-<Image alt="CIFAR-10" src="/content/blogs/designing-an-image-classifier-model-architecture/data/CIFAR-10.png" />
+<Figure alt="CIFAR-10" src="/content/blogs/designing-an-image-classifier-model-architecture/data/CIFAR-10.png" />
 </div>
 
 This dataset is pre-bundled with Keras, so if you are already using Keras and TensorFlow, you do not need to download it. Because we are working with images, having a GPU is helpful but not required.
 
 Let's load the dataset and start coding.
 
-<CodeBlock language="python" showLineNumbers>
-{`# Importing required libraries
+```python showLineNumbers
+# Importing required libraries
   import numpy as np
   import matplotlib.pyplot as plt
   from tensorflow.keras import datasets, utils
@@ -55,15 +55,15 @@ Let's load the dataset and start coding.
       # select the first image from each class
       plt.imshow(train_images[np.where(train_labels == i)[0][0]], cmap=plt.cm.binary)
       plt.xlabel(class_names[i])
-  plt.show()`}
-</CodeBlock>
+  plt.show()
+```
 
 ![CIFAR-10_plot.png](/content/blogs/designing-an-image-classifier-model-architecture/data/CIFAR-10_plot.png)
 
 ## Data Shape and Preprocessing
 
-<CodeBlock language="python" showLineNumbers>
-{`# Checking the shape of the data
+```python showLineNumbers
+# Checking the shape of the data
 print(f"Training Image Shape = {train_images.shape}")
 print(f"Training Label Shape = {train_labels.shape}")
 print(f"Testing Image Shape = {test_images.shape}")
@@ -73,17 +73,17 @@ print(f"Testing Label Shape = {test_labels.shape}")
 # Training Image Shape = (50000, 32, 32, 3)
 # Training Label Shape = (50000, 1)
 # Testing Image Shape = (10000, 32, 32, 3)
-# Testing Label Shape = (10000, 1)`}
-</CodeBlock>
+# Testing Label Shape = (10000, 1)
+```
 
 The training and testing images are in a tuple format. If you print `train_images[0]`, it will return a `(32, 32, 3)` tuple. This means the image has a height of 32 pixels, a width of 32 pixels, and 3 color channels (RGB). Each value in the array, ranging from 0 to 255, represents a pixel's intensity.
 
 Here is where your image processing knowledge comes in handy. We know that in deep learning, a normalized pixel value (from 0 to 1) is more suitable. So, let's normalize them.
 
-<CodeBlock language="python" showLineNumbers>
-{`train_images = train_images.astype("float32") / 255.0
-test_images = test_images.astype("float32") / 255.0`}
-</CodeBlock>
+```python showLineNumbers
+train_images = train_images.astype("float32") / 255.0
+test_images = test_images.astype("float32") / 255.0
+```
 
 Now, if we print `train_images[0]`, it will show us an array consisting of 32 arrays of 3-digit numbers ranging from 0 to 1 in decimal format.
 
@@ -93,11 +93,11 @@ We need to convert the integer labels of the images into one-hot encoded vectors
 
 We can easily one-hot encode our `test_labels` and `train_labels` using the `to_categorical()` function.
 
-<CodeBlock language="python" showLineNumbers>
-{`# One-hot encode labels
+```python showLineNumbers
+# One-hot encode labels
 test_labels = utils.to_categorical(test_labels)
-train_labels = utils.to_categorical(train_labels)`}
-</CodeBlock>
+train_labels = utils.to_categorical(train_labels)
+```
 
 Now that we are done with our project setup, let's dive into the architecture. We will be using Keras's sequential architecture. You can also use the functional architecture, but there might be some syntactical differences.
 
@@ -117,41 +117,41 @@ Again, you need the prerequisite knowledge to fully understand the architecture.
 
 So, the model will look something like this:
 
-<CodeBlock language="python" showLineNumbers>
-{`from tensorflow.keras import layers, models
+```python showLineNumbers
+from tensorflow.keras import layers, models
 
-  model = models.Sequential([
-      layers.Input(shape=(32, 32, 3)),
-      layers.Flatten(),
-      layers.Dense(100, activation="relu"),
-      layers.Dense(50, activation="relu"),
-      layers.Dense(10, activation="softmax"),
-  ])`}
-</CodeBlock>
+model = models.Sequential([
+    layers.Input(shape=(32, 32, 3)),
+    layers.Flatten(),
+    layers.Dense(100, activation="relu"),
+    layers.Dense(50, activation="relu"),
+    layers.Dense(10, activation="softmax"),
+])
+```
 
 Now, if we plot the model summary using `model.summary()`, we will get an output similar to the following:
 
 ![model_summary.png](/content/blogs/designing-an-image-classifier-model-architecture/data/model_summary.png)
 
-In the summary, you'll notice that the first value in the output shape is `None`. Keras uses `None` to indicate that the model can process any number of images simultaneously. Since the network performs tensor algebra, we don't need to pass images one by one; instead, we can process them in batches. For input images of shape `(32, 32, 3)`, the input size is calculated as <MarkdownLatex>{`32 \\times 32 \\times 3 = 3072`}</MarkdownLatex>.
+In the summary, you'll notice that the first value in the output shape is `None`. Keras uses `None` to indicate that the model can process any number of images simultaneously. Since the network performs tensor algebra, we don't need to pass images one by one; instead, we can process them in batches. For input images of shape `(32, 32, 3)`, the input size is calculated as $$32 \times 32 \times 3 = 3072$$.
 
 Now, let's examine the `first dense layer`. This layer contains 100 neurons, so the output shape is `(None, 100)`. In the "Param" column of the summary, we see a value representing the total number of parameters (weights) trained at each layer. Here's how this number is computed:
 
 - The input size is 3072, and each neuron in the dense layer connects to every input, along with an additional bias unit.
 - The total number of parameters is given by: `Parameters = (input_size * output_size) + output_size`
-- Substituting the values: <MarkdownLatex>{`(3072 \\times 100) + 100 = 307,300`}</MarkdownLatex>
+- Substituting the values: $$(3072 \times 100) + 100 = 307,300$$
 
 Similarly, we can calculate the parameters for the remaining dense layers:
 
-- **`dense_1` (50 neurons, input from `dense` layer):** <MarkdownLatex>{`(100 \\times 50) + 50 = 5,050`}</MarkdownLatex>
-- **`dense_2` (10 neurons, input from `dense_1` layer):** <MarkdownLatex>{`(50 \\times 10) + 10 = 510`}</MarkdownLatex>
+- **`dense_1` (50 neurons, input from `dense` layer):** $$(100 \times 50) + 50 = 5,050$$
+- **`dense_2` (10 neurons, input from `dense_1` layer):** $$(50 \times 10) + 10 = 510$$
 
 This formula accounts for both the weights (connections between neurons) and biases (one for each neuron). By following this method, we can determine the number of parameters for any dense layer in the model.
 
 Now, let's train the model and evaluate its performance:
 
-<CodeBlock language="python" showLineNumbers>
-{`from tensorflow.keras import optimizers
+```python showLineNumbers
+from tensorflow.keras import optimizers
 
 model.compile(loss="categorical_crossentropy",
               optimizer=optimizers.Adam(),
@@ -160,23 +160,22 @@ model.compile(loss="categorical_crossentropy",
 model.fit(train_images,
           train_labels,
           batch_size=32,
-          epochs=20)`}
-</CodeBlock>
+          epochs=20)
+```
 
 At this stage, I assume you are familiar with hyperparameters such as the loss function and optimizer. Since this is a multi-class classification problem, we use `categorical_crossentropy` as our loss function. For optimization, we use the default `Adam` optimizer, which is known for its adaptive learning rate and efficiency.
 
 We train the model for **20 epochs** with a **batch size of 32**:
 
 <div className='flex justify-center'>
-<Image alt="epoch_train" src="/content/blogs/designing-an-image-classifier-model-architecture/data/epoch_train.png" />
+<Figure alt="epoch_train" src="/content/blogs/designing-an-image-classifier-model-architecture/data/epoch_train.png" />
 </div>
 
 From the training results, we observe that the model achieves **approximately 50% accuracy** on the training dataset, which is relatively low. To further evaluate its performance, we test it on unseen data using `model.evaluate(test_images, test_labels)`.
 
-<CodeBlock>
+```planetext
 313/313 ━━━━━━━━━━━━━━━━━━━━ 1s 3ms/step - accuracy: 0.4696 - loss: 1.4891
-</CodeBlock>
-
+```
 
 In my case, the model's accuracy on the test dataset is **46.96%**, indicating potential overfitting or a suboptimal model architecture.
 
@@ -188,21 +187,21 @@ Convolution is another broad topic you need to understand to fully grasp why we 
 
 In TensorFlow Keras, we use the `Conv2D` layer to apply convolutions to an input tensor:
 
-<CodeBlock language="python" showLineNumbers>
-{`from tensorflow.keras import layers
+```python showLineNumbers
+from tensorflow.keras import layers
 
 conv_layer = layers.Conv2D(
     filters=10,
     kernel_size=(3,3),
     strides=1,
     padding="same"
-)`}
-</CodeBlock>
+)
+```
 
 Now, let's build a simple CNN model by adding a convolutional layer before a **Multilayer Perceptron (MLP)**.
 
-<CodeBlock language="python" showLineNumbers>
-{`cnn_model = models.Sequential([
+```python showLineNumbers
+cnn_model = models.Sequential([
     layers.Input(shape=(32, 32, 3)),
     layers.Conv2D(
         filters=32,
@@ -215,21 +214,21 @@ Now, let's build a simple CNN model by adding a convolutional layer before a **M
     layers.Dense(units=100, activation="relu"),
     layers.Dense(units=50, activation="relu"),
     layers.Dense(units=10, activation="softmax"),
-])`}
-</CodeBlock>
+])
+```
 
 You can also check the model's summary by running `cnn_model.summary()`. Now let's compile and run the model.
 
-<CodeBlock language="python" showLineNumbers>
-{`cnn_model.compile(loss="categorical_crossentropy",
+```python showLineNumbers
+cnn_model.compile(loss="categorical_crossentropy",
               optimizer=optimizers.Adam(),
               metrics=["accuracy"])
 
 cnn_model.fit(train_images,
           train_labels,
           batch_size=32,
-          epochs=20)`}
-</CodeBlock>
+          epochs=20)
+```
 
 After training, we evaluate the model on test data by running `cnn_model.evaluate(test_images, test_labels)`, where the testing accuracy achieved is **59.11% (0.5911)**. This indicates an improvement, but we will continue refining our model in future experiments.
 
@@ -239,8 +238,8 @@ Testing accuracy is the key metric to measure how well our model generalizes to 
 
 One other thing we can do is stack multiple `CNN` layers together. Let's add another `CNN` layer and see if the model improves.
 
-<CodeBlock language="python" showLineNumbers>
-{`cnn_model_2_layer = models.Sequential([
+```python showLineNumbers
+cnn_model_2_layer = models.Sequential([
       layers.Input(shape=(32, 32, 3)),
 
       # First convolutional layer
@@ -274,8 +273,8 @@ One other thing we can do is stack multiple `CNN` layers together. Let's add ano
 
   cnn_model_2_layer.fit(train_images, train_labels, batch_size=32, epochs=20)
 
-  cnn_model_2_layer.evaluate(test_images, test_labels)`}
-</CodeBlock>
+  cnn_model_2_layer.evaluate(test_images, test_labels)
+```
 
 Our model has improved, achieving an accuracy of **61.07%**, but not significantly. Another important observation is that the training accuracy continues to increase, reaching almost perfect scores (**98.27%**). This indicates a problem: rather than learning meaningful features, the model is simply memorizing the training data, which means our model is **overfitting**.
 
@@ -297,14 +296,14 @@ Now, let's explore the **different types of pooling** with a simple example.
 
 Suppose we have a **4x4 matrix (feature map)** after a convolution operation:
 
-<MarkdownLatex block={true}>
-{`\\begin{bmatrix}
-1 & 2 & 3 & 4 \\\\
-5 & 6 & 7 & 8 \\\\
-9 & 10 & 11 & 12 \\\\
+```math
+\begin{bmatrix}
+1 & 2 & 3 & 4 \\
+5 & 6 & 7 & 8 \\
+9 & 10 & 11 & 12 \\
 13 & 14 & 15 & 16
-\\end{bmatrix}`}
-</MarkdownLatex>
+\end{bmatrix}
+```
 
 Now, let's apply different types of pooling.
 
@@ -327,12 +326,12 @@ In **Max Pooling**, we take the **maximum value** from each window (sub-region).
 
 #### Final Max-Pooled Output:
 
-<MarkdownLatex block={true}>
-{`\\begin{bmatrix}
-6 & 8 \\\\
+```math
+\begin{bmatrix}
+6 & 8 \\
 14 & 16
-\\end{bmatrix}`}
-</MarkdownLatex>
+\end{bmatrix}
+```
 
 **Why use Max Pooling?**
 
@@ -358,12 +357,12 @@ Instead of taking the max value, **Average Pooling** takes the **average** of al
 
 #### Final Average-Pooled Output:
 
-<MarkdownLatex block={true}>
-{`\\begin{bmatrix}
-3.5 & 5.5 \\\\
+```math
+\begin{bmatrix}
+3.5 & 5.5 \\
 11.5 & 13.5
-\\end{bmatrix}`}
-</MarkdownLatex>
+\end{bmatrix}
+```
 
 **Why use Average Pooling?**
 
@@ -378,7 +377,7 @@ Instead of using a small window, **Global Pooling** applies pooling over the ent
   - **Output:** **16** (since 16 is the max value)
 - **Global Average Pooling:** Takes the average of all values in the feature map.
   - **Output:** **(sum of all values) / total elements**
-  - <MarkdownLatex>{`(1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16) / 16 = 8.5`}</MarkdownLatex>
+  - $$(1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16) / 16 = 8.5$$
 
 **Why use Global Pooling?**
 
@@ -401,8 +400,8 @@ Max pooling is the most commonly used in CNNs since it captures the most importa
 
 In our case, let's add a `MaxPooling` layer and see what happens.
 
-<CodeBlock language="python" showLineNumbers>
-{`cnn_with_pooling = models.Sequential([
+```python showLineNumbers
+cnn_with_pooling = models.Sequential([
     layers.Input(shape=(32, 32, 3)),
 
     # First convolutional block
@@ -426,8 +425,8 @@ In our case, let's add a `MaxPooling` layer and see what happens.
     layers.Dense(units=100, activation="relu"),
     layers.Dense(units=50, activation="relu"),
     layers.Dense(units=10, activation="softmax"),
-])`}
-</CodeBlock>
+])
+```
 
 If we run the `cnn_with_pooling` model exactly as before, we find that the training accuracy has decreased to **0.9083**, while the testing accuracy has increased to **0.6794** (your results may vary slightly). This is a positive outcome, as it suggests better generalization.
 
@@ -439,8 +438,8 @@ As there is room for improvement in `training`, increasing the total number of e
 
 To further address the overfitting problem, we can also introduce a **dropout layer**. Dropout works by randomly disabling a fraction of neurons during training, preventing the network from relying too heavily on specific neurons. This encourages the model to learn more robust and generalized features.
 
-<CodeBlock language="python" showLineNumbers>
-{`cnn_with_pooling_dropout = models.Sequential([
+```python showLineNumbers
+cnn_with_pooling_dropout = models.Sequential([
     layers.Input(shape=(32, 32, 3)),
 
     # First convolutional block
@@ -466,8 +465,8 @@ To further address the overfitting problem, we can also introduce a **dropout la
     layers.Dense(units=100, activation="relu"),
     layers.Dense(units=50, activation="relu"),
     layers.Dense(units=10, activation="softmax"),
-])`}
-</CodeBlock>
+])
+```
 
 In this model, we have introduced a `Dropout(rate=0.3)` which randomly disables **30%** of the neurons after each convolutional layer. Running this model, we observe a reduction in training accuracy. In my case, after **20 epochs**, the training accuracy was **0.7655**, while the testing accuracy improved to **0.7211**. This is great because both training and testing accuracy are increasing proportionally, indicating reduced overfitting. Additionally, running the model for more epochs may further improve the testing accuracy.
 
@@ -498,39 +497,38 @@ Although we don't need batch normalization in our example, let's still implement
 
 Let's say we have a small batch of numbers:
 
-<MarkdownLatex block={true}>
-{`[10, 20, 30, 40, 50]`}
-</MarkdownLatex>
-
+```math
+[10, 20, 30, 40, 50]
+```
 
 ### Step 1: Compute the Mean and Variance
 
 - **Mean (Average):**
-  <MarkdownLatex>{`\\mu_B = \\frac{10 + 20 + 30 + 40 + 50}{5} = 30`}</MarkdownLatex>
+  $$\mu_B = \frac{10 + 20 + 30 + 40 + 50}{5} = 30$$
 - **Variance (Spread of Values):**
-<MarkdownLatex>{`\\sigma_B^2 = \\frac{(10-30)^2 + (20-30)^2 + (30-30)^2 + (40-30)^2 + (50-30)^2}{5} = 200`}</MarkdownLatex>
+$$\sigma_B^2 = \frac{(10-30)^2 + (20-30)^2 + (30-30)^2 + (40-30)^2 + (50-30)^2}{5} = 200$$
 
 ### Step 2: Normalize the Values
 
 To make the values easier to process, we subtract the mean and divide by the standard deviation:
 
-<MarkdownLatex>{`\\hat{x}_i = \\frac{x_i - \\mu_B}{\\sqrt{\\sigma_B^2 + \\epsilon}}`}</MarkdownLatex>
+$$\hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}$$
 
 For example:
 
-- **For 10:** <MarkdownLatex>{`\\frac{10 - 30}{\\sqrt{200}} = -1.41`}</MarkdownLatex>
-- **For 20:** <MarkdownLatex>{`\\frac{20 - 30}{\\sqrt{200}} = -0.71`}</MarkdownLatex>
-- **For 30:** <MarkdownLatex>{`\\frac{30 - 30}{\\sqrt{200}} = 0`}</MarkdownLatex>
-- **For 40:** <MarkdownLatex>{`\\frac{40 - 30}{\\sqrt{200}} = 0.71`}</MarkdownLatex>
-- **For 50:** <MarkdownLatex>{`\\frac{50 - 30}{\\sqrt{200}} = 1.41`}</MarkdownLatex>
+- **For 10:** $$\frac{10 - 30}{\sqrt{200}} = -1.41$$
+- **For 20:** $$\frac{20 - 30}{\sqrt{200}} = -0.71$$
+- **For 30:** $$\frac{30 - 30}{\sqrt{200}} = 0$$
+- **For 40:** $$\frac{40 - 30}{\sqrt{200}} = 0.71$$
+- **For 50:** $$\frac{50 - 30}{\sqrt{200}} = 1.41$$
 
 Now, the values are adjusted to be around 0, which helps learning!
 
 ### Step 3: Scale and Shift (Learnable Parameters)
 
-Batch Normalization introduces two parameters: **gamma (<MarkdownLatex>{`\\gamma`}</MarkdownLatex>) and beta (<MarkdownLatex>{`\\beta`}</MarkdownLatex>)**, which adjust the data after normalization:
+Batch Normalization introduces two parameters: **gamma ($$\gamma$$) and beta ($$\beta$$)**, which adjust the data after normalization:
 
-<MarkdownLatex>{`y_i = \\gamma \\hat{x}_i + \\beta`}</MarkdownLatex>
+$$y_i = \gamma \hat{x}_i + \beta$$
 
 This allows the model to adjust values to the best scale and shift for learning.
 
@@ -538,32 +536,29 @@ This allows the model to adjust values to the best scale and shift for learning.
 
 BN is usually applied **before or after activation functions**. The typical order is:
 
-1. **Apply Linear Transformation:** <MarkdownLatex>{`z = Wx + b`}</MarkdownLatex>
+1. **Apply Linear Transformation:** $$z = Wx + b$$
 2. **Apply Batch Normalization**
 3. **Apply Activation Function (ReLU, Sigmoid, etc.)**
 
 #### Standard convention:
 
-<CodeBlock>
-{`Layer -> Batch Normalization -> Activation Function -> Next Layer`}
-</CodeBlock>
-
+```planetext
+Layer -> Batch Normalization -> Activation Function -> Next Layer
+```
 
 ## Advantages of Batch Normalization
-<MarkdownTable>
-{`
+
 | Advantage                    | Why It's Useful                                                           |
 | ---------------------------- | ------------------------------------------------------------------------- |
 | **Faster Training**          | Reduces the need for careful weight initialization, speeding up learning. |
 | **More Stable Training**     | Keeps the network's activations in a consistent range.                    |
 | **Better Generalization**    | Acts like regularization and prevents overfitting.                        |
 | **Less Reliance on Dropout** | Can reduce the need for dropout to prevent overfitting.                   |
-`}
-</MarkdownTable>
+
 Batch Normalization helps neural networks learn **faster, more reliably, and with better generalization**. By normalizing data within mini-batches, it ensures stable activations and reduces internal covariate shift.
 
-<CodeBlock language="python" showLineNumbers>
-{`cnn_with_all = models.Sequential([
+```python showLineNumbers
+cnn_with_all = models.Sequential([
       layers.Input(shape=(32, 32, 3)),
 
       # First convolutional block
@@ -597,8 +592,8 @@ Batch Normalization helps neural networks learn **faster, more reliably, and wit
       layers.BatchNormalization(),  # Batch Normalization added
       layers.Activation("relu"),    # Activation after BN
       layers.Dense(units=10, activation="softmax"),
-  ])`}
-</CodeBlock>
+  ])
+```
 
 As mentioned earlier, we don't need **Batch Normalization** in our example. If you run the model with **Batch Normalization**, you'll notice little to no change in training and testing accuracy. However, for demonstration purposes, I have added both the `BatchNormalization()` and `Dropout()` layers to show that we can also modify the **fully connected layers**. This highlights how these layers can be incorporated into different parts of the network to potentially improve performance.
 

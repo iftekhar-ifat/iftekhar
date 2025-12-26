@@ -1,10 +1,8 @@
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { Separator } from "@/components/ui/separator";
 import { getResearchContent } from "@/lib/mdx";
-import { MDXRemote } from "next-mdx-remote/rsc";
 import { notFound } from "next/navigation";
-import { getMDXComponents } from "../../../mdx-components";
-import PublicationType from "@/components/publication-type";
+import RemoteMDX from "@/components/shared/remote-mdx";
 
 export default async function Research() {
   const { publications, ongoing } = await getResearchContent();
@@ -12,10 +10,6 @@ export default async function Research() {
   if (!publications || !ongoing) {
     return notFound();
   }
-
-  const mdxComponents = getMDXComponents({
-    PublicationType: PublicationType,
-  });
 
   return (
     <MaxWidthWrapper className="my-4 md:my-8">
@@ -32,11 +26,8 @@ export default async function Research() {
               Publications
             </span>
           </div>
-          <div className="prose-ui !bg-background !text-primary">
-            <MDXRemote
-              source={publications.content}
-              components={mdxComponents}
-            />
+          <div className="text-neutral-800 dark:text-neutral-300">
+            <RemoteMDX content={publications.content} />
           </div>
         </div>
 
@@ -46,8 +37,8 @@ export default async function Research() {
               Ongoing
             </span>
           </div>
-          <div className="prose-ui !bg-background !text-primary">
-            <MDXRemote source={ongoing.content} components={mdxComponents} />
+          <div className="text-neutral-800 dark:text-neutral-300">
+            <RemoteMDX content={ongoing.content} />
           </div>
         </div>
       </div>

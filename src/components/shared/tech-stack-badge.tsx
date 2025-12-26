@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge } from "../ui/badge";
-import { IconSlug, TechIcons } from "./tech-icons";
+import TechIcons, { IconSlug } from "./tech-icons";
 import { cn } from "@/lib/utils";
 
 export default function TechStackBadge({

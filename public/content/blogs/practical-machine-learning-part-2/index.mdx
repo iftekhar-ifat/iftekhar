@@ -33,8 +33,8 @@ For our example, we choose to use the [house price prediction](https://www.kaggl
 
 To begin working with our dataset, we will import it using the "pandas" library and the "**read_csv**" method. This will allow us to easily load the data from the CSV file into our program. To avoid modifying the original data, we will make a copy of the dataset using the "**DataFrame**" method in pandas. This will allow us to perform any necessary data manipulations without affecting the original dataset.
 
-<CodeBlock language="python" title=" " showLineNumbers>
-{`import pandas as pd
+```python showLineNumbers
+import pandas as pd
 
 # import the dataset
 raw_dataset = pd.read_csv('./data.csv')
@@ -43,30 +43,28 @@ raw_dataset = pd.read_csv('./data.csv')
 dataframe = pd.DataFrame(raw_dataset)
 
 # head(x) method returns the first 'x' rows of the dataframe
-dataframe.head(5)`}
-
-</CodeBlock>
+dataframe.head(5)
+```
 
 ![dataframe-head](/content/blogs/practical-machine-learning-part-2/data/dataframe_head.png)
 
 As we can guess from the dataset that “date” is irrelevant in our dataset. So, We can eliminate the "Date" feature since it has no effect on predicting the house price.
 
-<CodeBlock language="python" showLineNumbers>
-  {`# dropping 'date' column
-dataframe.drop('date', axis = 1, inplace = True)`}
-</CodeBlock>
+```python showLineNumbers
+# dropping 'date' column
+dataframe.drop('date', axis = 1, inplace = True)
+```
 
 Data preprocessing is an essential step in machine learning that involves various techniques such as removing irrelevant or duplicated data, handling missing values, correcting inconsistencies, data normalization, feature engineering, and data augmentation. However, the specific preprocessing steps required may vary depending on the nature of the data and the project's requirements. In this particular case, we are fortunate to have a relatively clean dataset, and to keep this blog simple, we will not perform all of the data preprocessing techniques mentioned.
 
 Let's see what type of data we have in each column of our data to check the data types of our dataset columns.
 
-<CodeBlock language="python" showLineNumbers>
-  {`# "dtypes" property returns the data type of each column
-  dataframe.dtypes`}
-</CodeBlock>
-
+```python showLineNumbers 
+# "dtypes" property returns the data type of each column
+dataframe.dtypes
+```
 <div className="flex justify-center">
-  <Image alt="datatype" src="/content/blogs/practical-machine-learning-part-2/data/datatype.png" />
+  <Figure alt="datatype" src="/content/blogs/practical-machine-learning-part-2/data/datatype.png" />
 </div>
 
 Here we can see street, city, state zip, and country are in object type, and the rest of the columns are in some form of numerical type, either **int64** (integer number) or **float64** (decimal number).
@@ -83,21 +81,20 @@ Proper feature encoding is crucial to ensure that the categorical data is repres
 
 For our example let's separate all the categorical data and turn them into numerical data using Label Encoding.
 
-<CodeBlock language="python" title=" " showLineNumbers>
-{`# Getting all the columns name where dtype == object
+```python showLineNumbers
+# Getting all the columns name where dtype == object
 cat_cols = [col for col in dataframe.columns if dataframe[col].dtype == "object"]
 
-# Feature Encoding the categorical colums
+# Feature Encoding the categorical columns
 from sklearn.preprocessing import LabelEncoder
 label_encoder = LabelEncoder()
 
 # Turns categorical data into numerical data
 for col in cat_cols:
-      dataframe[col] = label_encoder.fit_transform(dataframe[col])
+    dataframe[col] = label_encoder.fit_transform(dataframe[col])
 
-dataframe.head(10)`}
-
-</CodeBlock>
+dataframe.head(10)
+```
 
 ![label-encoding-head](/content/blogs/practical-machine-learning-part-2/data/label_encoding_head.png)
 

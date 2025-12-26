@@ -111,204 +111,206 @@ In this section, we’ll walk through the process of building a simple GAN from 
 Before we dive into the network architectures, let’s ensure our PyTorch environment is set up.
 First, let’s import the necessary libraries:
 
-<CodeBlock language="python" showLineNumbers>
-{`import torch
+```python showLineNumbers
+import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-import numpy as np`}
-</CodeBlock>
+import numpy as np
+```
 
 Next, we’ll define our transformations and load the Fashion-MNIST dataset. It’s crucial to normalize the images to a range that’s suitable for our neural networks, typically between -1 and 1, as this often helps with GAN training stability.
 
-<CodeBlock language="python" showLineNumbers>
-{`# Define transformations for the dataset
-	transform = transforms.Compose([
-		transforms.ToTensor(),
-		transforms.Normalize((0.5,), (0.5,)) # Normalize to [-1, 1]
-	])
+```python showLineNumbers
+# Define transformations for the dataset
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,)) # Normalize to [-1, 1]
+])
 
-	# Load the Fashion-MNIST dataset
-	train_dataset = datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
+# Load the Fashion-MNIST dataset
+train_dataset = datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
 
-	train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)`}
-</CodeBlock>
+train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
+```
 
 ### The Generator Architecture
 
 The Generator’s job is to take a random noise vector (our latent space) and upsample it into a 28x28 image. We’ll use a series of linear layers followed by `BatchNorm1d` and `LeakyReLU` activations, and then reshape the output to form an image. The final layer will use a `tanh` activation to ensure the output pixels are in the range [-1, 1], matching our normalized input data.
 
-<CodeBlock language="python" showLineNumbers>
-{`# Generator Class
-	class Generator(nn.Module):
-		def __init__(self, latent_dim):
-			super(Generator, self).__init__()
-			self.main = nn.Sequential(
-				# Input: latent_dim
-				nn.Linear(latent_dim, 256),
-				nn.LeakyReLU(0.2),
-				nn.BatchNorm1d(256),
+```python showLineNumbers
+# Generator Class
+class Generator(nn.Module):
+        def __init__(self, latent_dim):
+        super(Generator, self).__init__()
+        self.main = nn.Sequential(
+            # Input: latent_dim
+            nn.Linear(latent_dim, 256),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(256),
 
-				nn.Linear(256, 512),
-				nn.LeakyReLU(0.2),
-				nn.BatchNorm1d(512),
+            nn.Linear(256, 512),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(512),
 
-				nn.Linear(512, 1024),
-				nn.LeakyReLU(0.2),
-				nn.BatchNorm1d(1024),
+            nn.Linear(512, 1024),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(1024),
 
-				nn.Linear(1024, 28 * 28), # Output: 28x28 image
-				nn.Tanh() # Normalize to [-1, 1]
-			)
+            nn.Linear(1024, 28 * 28), # Output: 28x28 image
+            nn.Tanh() # Normalize to [-1, 1]
+        )
 
-		def forward(self, input):
-			return self.main(input).view(-1, 1, 28, 28)`}
-</CodeBlock>
+    def forward(self, input):
+        return self.main(input).view(-1, 1, 28, 28)
+```
 
 ### The Discriminator Architecture
 
 The Discriminator’s role is to classify an input image as either real or fake. It will take a 28x28 image, flatten it, and pass it through a series of linear layers with `LeakyReLU` activations. The final layer will use a `Sigmoid` activation to output a probability between 0 and 1.
 
-<CodeBlock language="python" showLineNumbers>
-{`# Discriminator Class
-	class Discriminator(nn.Module):
-		def __init__(self):
-			super(Discriminator, self).__init__()
-			self.main = nn.Sequential(
-				# Input: 28x28 image
-				nn.Linear(28 * 28, 1024),
-				nn.LeakyReLU(0.2),
-				nn.Dropout(0.3),
+```python showLineNumbers
+# Discriminator Class
+class Discriminator(nn.Module):
+    def __init__(self):
+        super(Discriminator, self).__init__()
+        self.main = nn.Sequential(
+            # Input: 28x28 image
+            nn.Linear(28 * 28, 1024),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.3),
+            nn.Linear(1024, 512),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.3),
+            nn.Linear(512, 256),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.3),
+            nn.Linear(256, 1),  # Output: probability of real/fake
+            nn.Sigmoid(),
+        )
 
-				nn.Linear(1024, 512),
-				nn.LeakyReLU(0.2),
-				nn.Dropout(0.3),
+    def forward(self, input):
+        return self.main(input.view(input.size(0), -1))
 
-				nn.Linear(512, 256),
-				nn.LeakyReLU(0.2),
-				nn.Dropout(0.3),
-
-				nn.Linear(256, 1), # Output: probability of real/fake
-				nn.Sigmoid()
-			)
-
-		def forward(self, input):
-			return self.main(input.view(input.size(0), -1))`}
-</CodeBlock>
+```
 
 ### Training the GAN
 
 Now that we have our Generator and Discriminator defined, we can set up the training loop. We’ll need to define our hyperparameters, instantiate the networks, set up optimizers, and define our loss function (Binary Cross-Entropy).
 
-<CodeBlock language="python" showLineNumbers>
-{`# Hyperparameters
-	latent_dim = 100
-	epochs = 200
-	lr = 0.0002
-	b1 = 0.5  # Adam: beta1
-	b2 = 0.999  # Adam: beta2
+```python showLineNumbers
+# Hyperparameters
+latent_dim = 100
+epochs = 200
+lr = 0.0002
+b1 = 0.5  # Adam: beta1
+b2 = 0.999  # Adam: beta2
 
-	# Initialize Generator and Discriminator
-	generator = Generator(latent_dim)
-	discriminator = Discriminator()
+# Initialize Generator and Discriminator
+generator = Generator(latent_dim)
+discriminator = Discriminator()
 
-	# Use GPU if available
-	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-	generator.to(device)
-	discriminator.to(device)
+# Use GPU if available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+generator.to(device)
+discriminator.to(device)
 
-	# Optimizers
-	optimizer_G = optim.Adam(generator.parameters(), lr=lr, betas=(b1, b2))
-	optimizer_D = optim.Adam(discriminator.parameters(), lr=lr, betas=(b1, b2))
+# Optimizers
+optimizer_G = optim.Adam(generator.parameters(), lr=lr, betas=(b1, b2))
+optimizer_D = optim.Adam(discriminator.parameters(), lr=lr, betas=(b1, b2))
 
-	# Loss function
-	criterion = nn.BCELoss()
+# Loss function
+criterion = nn.BCELoss()
 
-	# Lists to track losses
-	g_losses = []
-	d_losses = []
+# Lists to track losses
+g_losses = []
+d_losses = []
 
-	# Training loop
-	for epoch in range(epochs):
-		epoch_g_loss = 0.0
-		epoch_d_loss = 0.0
-		batch_count = 0
+# Training loop
+for epoch in range(epochs):
+    epoch_g_loss = 0.0
+    epoch_d_loss = 0.0
+    batch_count = 0
 
-		for i, (imgs, _) in enumerate(train_loader):
-			# Adversarial ground truths
-			real = torch.ones(imgs.size(0), 1).to(device)
-			fake = torch.zeros(imgs.size(0), 1).to(device)
+    for i, (imgs, _) in enumerate(train_loader):
+        # Adversarial ground truths
+        real = torch.ones(imgs.size(0), 1).to(device)
+        fake = torch.zeros(imgs.size(0), 1).to(device)
 
-			# Configure input
-			real_imgs = imgs.to(device)
+        # Configure input
+        real_imgs = imgs.to(device)
 
-			# ---------------------
-			#  Train Discriminator
-			# ---------------------
-			optimizer_D.zero_grad()
+        # ---------------------
+        #  Train Discriminator
+        # ---------------------
+        optimizer_D.zero_grad()
 
-			# Real images
-			output_real = discriminator(real_imgs)
-			loss_real = criterion(output_real, real)
+        # Real images
+        output_real = discriminator(real_imgs)
+        loss_real = criterion(output_real, real)
 
-			# Fake images
-			z = torch.randn(imgs.size(0), latent_dim).to(device)
-			gen_imgs = generator(z)
-			output_fake = discriminator(gen_imgs.detach())
-			loss_fake = criterion(output_fake, fake)
+        # Fake images
+        z = torch.randn(imgs.size(0), latent_dim).to(device)
+        gen_imgs = generator(z)
+        output_fake = discriminator(gen_imgs.detach())
+        loss_fake = criterion(output_fake, fake)
 
-			# Total discriminator loss
-			d_loss = (loss_real + loss_fake) / 2
-			d_loss.backward()
-			optimizer_D.step()
+        # Total discriminator loss
+        d_loss = (loss_real + loss_fake) / 2
+        d_loss.backward()
+        optimizer_D.step()
 
-			# -----------------
-			#  Train Generator
-			# -----------------
-			optimizer_G.zero_grad()
+        # -----------------
+        #  Train Generator
+        # -----------------
+        optimizer_G.zero_grad()
 
-			z = torch.randn(imgs.size(0), latent_dim).to(device)
-			gen_imgs = generator(z)
+        z = torch.randn(imgs.size(0), latent_dim).to(device)
+        gen_imgs = generator(z)
 
-			# Generator wants discriminator to think fakes are real
-			g_loss = criterion(discriminator(gen_imgs), real)
+        # Generator wants discriminator to think fakes are real
+        g_loss = criterion(discriminator(gen_imgs), real)
 
-			g_loss.backward()
-			optimizer_G.step()
+        g_loss.backward()
+        optimizer_G.step()
 
-			# Accumulate losses
-			epoch_d_loss += d_loss.item()
-			epoch_g_loss += g_loss.item()
-			batch_count += 1
+        # Accumulate losses
+        epoch_d_loss += d_loss.item()
+        epoch_g_loss += g_loss.item()
+        batch_count += 1
 
-		# Save average loss per epoch
-		avg_d_loss = epoch_d_loss / batch_count
-		avg_g_loss = epoch_g_loss / batch_count
-		d_losses.append(avg_d_loss)
-		g_losses.append(avg_g_loss)
+    # Save average loss per epoch
+    avg_d_loss = epoch_d_loss / batch_count
+    avg_g_loss = epoch_g_loss / batch_count
+    d_losses.append(avg_d_loss)
+    g_losses.append(avg_g_loss)
 
-		print(f"[Epoch {epoch+1}/{epochs}] [D loss: {avg_d_loss:.4f}] [G loss: {avg_g_loss:.4f}]")
+    print(
+        f"[Epoch {epoch+1}/{epochs}] [D loss: {avg_d_loss:.4f}] [G loss: {avg_g_loss:.4f}]"
+    )
 
+    # Save generated images for visualization
+    if epoch % 50 == 0:
+        with torch.no_grad():
+            z = torch.randn(25, latent_dim).to(device)
+            generated_samples = generator(z).cpu()
+            generated_samples = generated_samples.view(
+                generated_samples.size(0), 28, 28
+            )
+            generated_samples = (generated_samples + 1) / 2  # Denormalize
+            fig = plt.figure(figsize=(5, 5))
+            for k in range(generated_samples.size(0)):
+                plt.subplot(5, 5, k + 1)
+                plt.imshow(generated_samples[k])
+                plt.axis("off")
+            plt.tight_layout()
+            plt.show()
+            plt.savefig(f"generated_epoch_{epoch}.png")
+            plt.close(fig)
 
-		# Save generated images for visualization
-		if epoch % 50 == 0:
-			with torch.no_grad():
-				z = torch.randn(25, latent_dim).to(device)
-				generated_samples = generator(z).cpu()
-				generated_samples = generated_samples.view(generated_samples.size(0), 28, 28)
-				generated_samples = (generated_samples + 1) / 2  # Denormalize
-				fig = plt.figure(figsize=(5, 5))
-				for k in range(generated_samples.size(0)):
-					plt.subplot(5, 5, k + 1)
-					plt.imshow(generated_samples[k])
-					plt.axis('off')
-				plt.tight_layout()
-				plt.show()
-				plt.savefig(f"generated_epoch_{epoch}.png")
-				plt.close(fig)`}
-</CodeBlock>
+```
 
 This training loop controls the adversarial process. In each iteration, we train the Discriminator on both genuine and generated images before teaching the Generator to create images that deceive the Discriminator. As training progresses, you should observe the `d_loss` and `g_loss` values fluctuating, ideally converging to a state where the Discriminator’s loss is around 0.5 (meaning it’s guessing) and the Generator’s loss is also stable.
 
@@ -318,8 +320,8 @@ Here you can see our GAN's progression from random noise to recognizable fashion
 
 Let’s now take a closer look at how our model is performing by plotting the Generator and Discriminator losses over each epoch. This can help us understand whether the training is progressing well or if something is going wrong.
 
-<CodeBlock language="python" showLineNumbers>
-{`plt.figure(figsize=(10, 5))
+```python showLineNumbers
+plt.figure(figsize=(10, 5))
 plt.plot(range(epochs), g_losses, label="Generator Loss")
 plt.plot(range(epochs), d_losses, label="Discriminator Loss")
 plt.xlabel("Epoch")
@@ -327,8 +329,8 @@ plt.ylabel("Loss")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
-plt.show()`}
-</CodeBlock>
+plt.show()
+```
 
 ![Loss Curve](/content/blogs/the-game-of-deception-generative-adversarial-network-gans/data/loss_curve.png)
 

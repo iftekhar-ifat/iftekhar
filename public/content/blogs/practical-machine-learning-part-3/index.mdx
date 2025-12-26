@@ -17,24 +17,23 @@ The recommended ratio for this partition is 80:20, where 80% of the data is used
 
 First, we need to separate our features and the target. In our case, price is our target ( what we want to predict ) and the rest of the dataset is our features. So,
 
-<CodeBlock language="python" showLineNumbers>
-{`# X = feature
+```python showLineNumbers
+# X = feature
 X = dataframe.drop("price", axis=1)    # everything except 'price' column
 
 # y = Target
-y = dataframe["price"] # only 'price' column`}
-</CodeBlock>
+y = dataframe["price"] # only 'price' column
+```
 
 Now for the splitting, we will use scikit-learn’s **`train_test_split`** function. The **`train_test_split`** function from scikit-learn is a useful tool for dividing a dataset into separate training and testing sets. This function randomly splits the data into two separate sets, one for training the machine learning model and one for testing the model's performance.
 
 The function takes a few arguments, the most important of which are the **‘X’** and **‘y’** parameters, which represent the dataset features and target variables, respectively. The **`test_size`** parameter determines the proportion of the data to be used for testing, in our case it’s 0.2 because we want to split the dataset into **80/20**. The **`random_state`** parameter sets a seed for the random number generator to ensure that the same split is produced each time the code is run.
 
-<CodeBlock language="python" showLineNumbers>
-{`from sklearn.model_selection import train_test_split
+```python showLineNumbers
+from sklearn.model_selection import train_test_split
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)`}
-
-</CodeBlock>
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+```
 
 Now if we run the ‘head()’ function for **X_train, X_test, y_train,** and **y_test** we will see that, ‘X_train’ contains 80% of the features and **‘X_test’** contains the other 20% of the features, where **‘y_train’** contains the 80% of the target corresponding to **‘X_train’** and **‘y_test’** contains 20% of the target corresponding to **‘X_test’**.
 

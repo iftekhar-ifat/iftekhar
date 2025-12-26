@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@prose-ui/next/prose-ui.css";
 @import "katex/dist/katex.min.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -78,8 +77,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --p-link-text-color: oklch(74% 0.16 232.661);
-  --p-link-text-decoration-color: oklch(30% 0.16 232.661);
+  --codeblock-background: oklch(0.9851 0 0);
+  --p-color-bg-surface1: oklch(0.98 0 0);
+  --p-color-bg-surface2: oklch(0.97 0 0);
 }
 
 .dark {
@@ -114,8 +114,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --p-link-text-color: oklch(74% 0.16 232.661);
-  --p-link-text-decoration-color: oklch(30% 0.16 232.661);
+  --codeblock-background: oklch(0.2132 0.0042 264.48);
 }
 
 @layer base {
@@ -126,14 +125,55 @@
     @apply bg-background text-foreground;
   }
 }
-.prose-ui table {
-  margin-top: 0px;
-  margin-bottom: 0px;
+
+figure [data-rehype-pretty-code-title] {
+  display: none;
 }
 
-.prose-ui p a:hover,
-.prose-ui td a:hover,
-.prose-ui li a:hover {
-  color: oklch(80% 0.16 232.661);
-  text-decoration-color: oklch(80% 0.16 232.661);
+code[data-line-numbers] {
+  counter-reset: line;
+}
+
+code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+
+  display: inline-block;
+  margin-right: 1rem;
+  text-align: right;
+  color: var(--muted-foreground);
+  width: 1rem;
+}
+
+code[data-line-numbers-max-digits="2"] > [data-line]::before {
+  width: 1.5rem;
+}
+
+code[data-line-numbers-max-digits="3"] > [data-line]::before {
+  width: 2rem;
+}
+
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+}
+
+html.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+}
+
+pre {
+  background-color: var(--codeblock-background);
+  padding: 0.2rem;
+}
+
+*[data-rehype-pretty-code-figure] code {
+  background-color: transparent !important;
+}
+
+code {
+  background-color: var(--muted);
+  border-radius: 0.25rem;
+  padding-inline: 0.3rem;
+  padding-block: 0.2rem;
+  font-size: var(--text-sm) /* 0.875rem = 14px */;
 }

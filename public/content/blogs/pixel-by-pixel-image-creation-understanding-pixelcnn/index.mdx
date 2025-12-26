@@ -45,130 +45,129 @@ The typical PixelCNN is built by stacking these masked convolutional layers and 
 
 Before we delve into the network, we'll set up our environment: load the core PyTorch and torchvision modules, and prepare the Fashion-MNIST dataset using a simple tensor transform.  Because PixelCNN is a deep generative model, we must train it for a larger number of epochs to achieve decent results; offloading computation to the GPU will speed up training and sampling.
 
-<CodeBlock language="python" showLineNumbers>
-{`import torch
-  import torch.nn as nn
-  import torch.optim as optim
-  from torchvision import datasets, transforms
-  from torch.utils.data import DataLoader
-  import torch.nn.functional as F
-  import matplotlib.pyplot as plt
+```python showLineNumbers
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+import torch.nn.functional as F
+import matplotlib.pyplot as plt
 
-  # Set up the device
-  device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# Set up the device
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-  # Load and transform data
-  transform = transforms.Compose([
-      transforms.ToTensor()
-  ])
+# Load and transform data
+transform = transforms.Compose([
+    transforms.ToTensor()
+])
 
-  batch_size = 128
+batch_size = 128
 
-  train_dataset = datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
-  train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)`}
-</CodeBlock>
+train_dataset = datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+```
 
 To build our PixelCNN, we follow these steps, stacking masked convolutions and residual blocks, then ending with a 1×1 “head” that predicts a 256-way distribution over pixel values:
 
 1. **Define the Masked Convolution:**
-    <CodeBlock language="python" showLineNumbers>
-    {`class MaskedConv2d(nn.Conv2d):
-         def __init__(self, mask_type, in_channels, out_channels, kernel_size, **kwargs):
-             super().__init__(in_channels, out_channels, kernel_size, **kwargs)
-             assert mask_type in {"A", "B"}
-             self.register_buffer("mask", torch.ones_like(self.weight))
-             kH, kW = kernel_size if isinstance(kernel_size, tuple) else (kernel_size, kernel_size)
-             yc, xc = kH // 2, kW // 2
+    ```python showLineNumbers
+    class MaskedConv2d(nn.Conv2d):
+        def __init__(self, mask_type, in_channels, out_channels, kernel_size, **kwargs):
+            super().__init__(in_channels, out_channels, kernel_size, **kwargs)
+            assert mask_type in {"A", "B"}
+            self.register_buffer("mask", torch.ones_like(self.weight))
+            kH, kW = kernel_size if isinstance(kernel_size, tuple) else (kernel_size, kernel_size)
+            yc, xc = kH // 2, kW // 2
 
-             # Type A: block current & future pixels
-             if mask_type == "A":
-                 self.mask[:, :, yc, xc:] = 0
-             # Type B: allow current pixel (from previous layer) but block future
-             else:
-                 self.mask[:, :, yc, xc+1:] = 0
-             self.mask[:, :, yc+1:] = 0
+            # Type A: block current & future pixels
+            if mask_type == "A":
+                self.mask[:, :, yc, xc:] = 0
+            # Type B: allow current pixel (from previous layer) but block future
+            else:
+                self.mask[:, :, yc, xc+1:] = 0
+            self.mask[:, :, yc+1:] = 0
 
-         def forward(self, x):
-             # Zero-out “future” weights before convolving
-             self.weight.data *= self.mask
-             return super().forward(x)`}
-    </CodeBlock>
-
+        def forward(self, x):
+            # Zero-out “future” weights before convolving
+            self.weight.data *= self.mask
+            return super().forward(x)
+    ```
     - **Type A** is used only in the very first layer, ensuring the network can’t peek at the pixel it’s predicting and the future pixels.
     - **Type B** is used in all deeper layers. It still blocks connections to future pixels, but allows the center pixel’s activations (as computed by earlier layers) to flow through.
 
 2. **Build Residual Blocks:**
 
-    <CodeBlock language="python" showLineNumbers>
-    {`class ResidualBlock(nn.Module):
-         def __init__(self, channels):
-             super().__init__()
-             self.block = nn.Sequential(
-                 nn.ReLU(),
-                 MaskedConv2d("B", channels, channels // 2, kernel_size=1),
-                 nn.ReLU(),
-                 MaskedConv2d("B", channels // 2, channels // 2, kernel_size=3, padding=1),
-                 nn.ReLU(),
-                 MaskedConv2d("B", channels // 2, channels, kernel_size=1),
-             )
+    ```python showLineNumbers
+    class ResidualBlock(nn.Module):
+        def __init__(self, channels):
+            super().__init__()
+            self.block = nn.Sequential(
+                nn.ReLU(),
+                MaskedConv2d("B", channels, channels // 2, kernel_size=1),
+                nn.ReLU(),
+                MaskedConv2d("B", channels // 2, channels // 2, kernel_size=3, padding=1),
+                nn.ReLU(),
+                MaskedConv2d("B", channels // 2, channels, kernel_size=1),
+            )
 
-         def forward(self, x):
-             return x + self.block(x)`}
-    </CodeBlock>
-
+        def forward(self, x):
+            return x + self.block(x)
+    ```
     Each block squeezes features down to half the channels and then back up, all with `Type B` masking, and adds the original input back (a standard ResNet-style skip).
 
 3. **PixelCNN Model:**
 
-    <CodeBlock language="python" showLineNumbers>
-    {`class PixelCNN(nn.Module):
-         def __init__(self, input_channels=1, hidden_channels=128, num_residual_blocks=10):
-             super().__init__()
-             # 1) First layer: Type A mask
-             self.input_conv = MaskedConv2d("A", input_channels, hidden_channels, kernel_size=7, padding=3)
+    ```python showLineNumbers
+    # Generator Class
+    class Generator(nn.Module):
+        def __init__(self, latent_dim):
+        super(Generator, self).__init__()
+        self.main = nn.Sequential(
+            # Input: latent_dim
+            nn.Linear(latent_dim, 256),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(256),
 
-             # 2) Stack of residual blocks (Type B masks)
-             blocks = [ResidualBlock(hidden_channels) for _ in range(num_residual_blocks)]
-             self.residual_blocks = nn.Sequential(*blocks)
+            nn.Linear(256, 512),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(512),
 
-             # 3) Output head: two 1×1 convolutions, ending in 256 channels
-             self.output = nn.Sequential(
-                 nn.ReLU(),
-                 nn.Conv2d(hidden_channels, hidden_channels, kernel_size=1),
-                 nn.ReLU(),
-                 nn.Conv2d(hidden_channels, 256, kernel_size=1)  # predicts logits for values 0–255
-             )
+            nn.Linear(512, 1024),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(1024),
 
-         def forward(self, x):
-             x = self.input_conv(x)
-             x = self.residual_blocks(x)
-             return self.output(x)`}
-    </CodeBlock>
+            nn.Linear(1024, 28 * 28), # Output: 28x28 image
+            nn.Tanh() # Normalize to [-1, 1]
+        )
 
+    def forward(self, input):
+        return self.main(input).view(-1, 1, 28, 28)
+    ```
     - The **input** is a single-channel image (grayscale) or intensity grid.
     - The **output** is a tensor of shape `[B, 256, H, W]`, where each of the 256 channels at `(i,j)` represents the unnormalized logit for that pixel’s intensity.
     - The network’s output head produces unnormalized logits over 256 possible pixel values (0–255). During training, we feed those [B, 256, H, W] logits directly into `CrossEntropyLoss`, which applies softmax internally. When sampling, we explicitly apply `softmax` to convert logits into a probability distribution before drawing a pixel value.
     <Callout variant="info" title="Logits?">Logits are the raw scores a network produces before softmax. They aren’t probabilities yet, just values indicating how likely each class (e.g., pixel values 0–255) is. Softmax converts them into actual probabilities.</Callout>
 
 4. **Training and Sampling:**
-    <CodeBlock language="python" showLineNumbers>
-    {`# Sampling function
+    ```python showLineNumbers
+    # Sampling function
     def sample_images(model, device, num_images=5, img_size=28):
-         model.eval()
-         # Store class indices (0–255) during generation
-         samples = torch.zeros(num_images, 1, img_size, img_size, dtype=torch.long, device=device)
-           
-         with torch.no_grad():
-             for i in range(img_size):
-                 for j in range(img_size):
-                     # Normalize to [0,1] before feeding into the model
-                     out = model(samples.float() / 255.0)
-                     probs = F.softmax(out[:, :, i, j], dim=1)
-                     pixel_value = torch.multinomial(probs, 1).squeeze(-1)  # class index
-                     samples[:, 0, i, j] = pixel_value
-           
-         # Convert to float [0,1] for display
-         return samples.float() / 255.0
+        model.eval()
+        # Store class indices (0–255) during generation
+        samples = torch.zeros(num_images, 1, img_size, img_size, dtype=torch.long, device=device)
+        
+        with torch.no_grad():
+            for i in range(img_size):
+                for j in range(img_size):
+                    # Normalize to [0,1] before feeding into the model
+                    out = model(samples.float() / 255.0)
+                    probs = F.softmax(out[:, :, i, j], dim=1)
+                    pixel_value = torch.multinomial(probs, 1).squeeze(-1)  # class index
+                    samples[:, 0, i, j] = pixel_value
+        
+        # Convert to float [0,1] for display
+        return samples.float() / 255.0
 
     # Settings
     num_epochs = 20
@@ -181,35 +180,34 @@ To build our PixelCNN, we follow these steps, stacking masked convolutions and r
     losses = []
 
     for epoch in range(num_epochs):
-         epoch_loss = 0
-         model.train()
-         for i, (images, _) in enumerate(train_loader):
-             images = images.to(device)
-             outputs = model(images)
-             targets = (images * 255).long().squeeze(1)  # already in [0,1] → map to [0,255]
-             loss = criterion(outputs, targets)
+        epoch_loss = 0
+        model.train()
+        for i, (images, _) in enumerate(train_loader):
+            images = images.to(device)
+            outputs = model(images)
+            targets = (images * 255).long().squeeze(1)  # already in [0,1] → map to [0,255]
+            loss = criterion(outputs, targets)
 
-             optimizer.zero_grad()
-             loss.backward()
-             optimizer.step()
-             epoch_loss += loss.item()
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
 
-         avg_loss = epoch_loss / len(train_loader)
-         losses.append(avg_loss)
-         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}')
+        avg_loss = epoch_loss / len(train_loader)
+        losses.append(avg_loss)
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}')
 
-         # Generate 5 images after every 10 epochs
-         if (epoch + 1) % 10 == 0:
-             generated = sample_images(model, device, num_images=5, img_size=28)
-             plt.figure(figsize=(15, 3))
-             for idx in range(5):
-                 plt.subplot(1, 5, idx + 1)
-                 plt.imshow(generated[idx, 0].cpu())
-                 plt.axis('off')
-             plt.show()`}
-    </CodeBlock>
-    - **Sampling Function**:
-        - Generates images pixel-by-pixel in order.
+        # Generate 5 images after every 10 epochs
+        if (epoch + 1) % 10 == 0:
+            generated = sample_images(model, device, num_images=5, img_size=28)
+            plt.figure(figsize=(15, 3))
+            for idx in range(5):
+                plt.subplot(1, 5, idx + 1)
+                plt.imshow(generated[idx, 0].cpu())
+                plt.axis('off')
+            plt.show()
+    ```
+     **Sampling Function**: Generates images pixel-by-pixel in order.
         - Predicts a distribution over 256 values for each pixel.
         - Samples from the distribution using `torch.multinomial`.
 
@@ -223,44 +221,44 @@ To build our PixelCNN, we follow these steps, stacking masked convolutions and r
 
 5. **Generating Images, One Pixel at a Time:**
 
-<CodeBlock language="python" showLineNumbers>
-{`def generate_samples(model, num_samples=16, img_size=28, device="cuda"):
-      model.eval()
-      with torch.no_grad():
-          # Store class indices (0–255) during generation
-          samples = torch.zeros(num_samples, 1, img_size, img_size, dtype=torch.long, device=device)
-          
-          for i in range(img_size):
-              for j in range(img_size):
-                  # Normalize to [0,1] before feeding to model
-                  out = model(samples.float() / 255.0)
-                  probs = torch.softmax(out[:, :, i, j], dim=1)
-                  pixel = torch.multinomial(probs, 1).squeeze(-1)  # class index
-                  samples[:, 0, i, j] = pixel
-          
-          # Convert to float in [0,1] for display
-          return samples.float() / 255.0
+```python showLineNumbers
+def generate_samples(model, num_samples=16, img_size=28, device="cuda"):
+    model.eval()
+    with torch.no_grad():
+        # Store class indices (0–255) during generation
+        samples = torch.zeros(num_samples, 1, img_size, img_size, dtype=torch.long, device=device)
+        
+        for i in range(img_size):
+            for j in range(img_size):
+                # Normalize to [0,1] before feeding to model
+                out = model(samples.float() / 255.0)
+                probs = torch.softmax(out[:, :, i, j], dim=1)
+                pixel = torch.multinomial(probs, 1).squeeze(-1)  # class index
+                samples[:, 0, i, j] = pixel
+        
+        # Convert to float in [0,1] for display
+        return samples.float() / 255.0
 
-  # Generate and show
-  samples = generate_samples(model)
-  fig, axes = plt.subplots(4, 4, figsize=(8, 8))
-  for idx, ax in enumerate(axes.flat):
-      ax.imshow(samples[idx, 0].cpu().numpy(), cmap='gray')
-      ax.axis('off')
-  plt.tight_layout()
-  plt.show()`}
-</CodeBlock>
+# Generate and show
+samples = generate_samples(model)
+fig, axes = plt.subplots(4, 4, figsize=(8, 8))
+for idx, ax in enumerate(axes.flat):
+    ax.imshow(samples[idx, 0].cpu().numpy(), cmap='gray')
+    ax.axis('off')
+plt.tight_layout()
+plt.show()
+```
 
 - Initialization: start from an all-zero integer tensor.
-- For each <MarkdownLatex>{`(i,j)`}</MarkdownLatex> in pixel order, normalize, forward-pass, softmax, then sample.
+- For each $$(i,j)$$ in pixel order, normalize, forward-pass, softmax, then sample.
 - Sampling vs. Greedy:
   - `torch.multinomial(probs, 1)` gives random draws, creating variety.
   - You can try out `torch.argmax(probs, 1)` that would give you the most likely pixel at each step (deterministic).
 - Result: once every position is filled, convert to floats in [0,1] and display as a grid of images.
 
-<Frame align="center">
-  <Image alt="PixelCNNSample" src="/content/blogs/pixel-by-pixel-image-creation-understanding-pixelcnn/data/sample.png" width="500" height="500" />
-</Frame>
+<div align="center">
+  <Figure alt="PixelCNNSample" src="/content/blogs/pixel-by-pixel-image-creation-understanding-pixelcnn/data/sample.png" width="500" height="500" />
+</div>
 
 # Challenges with PixelCNN
 

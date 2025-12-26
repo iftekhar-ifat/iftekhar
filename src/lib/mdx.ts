@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
+import matter, { language } from "gray-matter";
 import { IconSlug } from "@/components/shared/tech-icons";
+import { visit } from "unist-util-visit";
 
 export type BlogMetadata = {
   title: string;
@@ -252,5 +253,50 @@ export async function getProjectBySlug(
       links: data.links,
       slug,
     },
+  };
+}
+
+// First plugin: Extract raw code BEFORE rehypePrettyCode
+export function rehypeExtractRaw() {
+  return (tree: any) => {
+    visit(tree, (node) => {
+      if (node?.type === "element" && node?.tagName === "pre") {
+        const [codeEl] = node.children;
+        if (codeEl.tagName !== "code") return;
+
+        // Store raw on the pre node
+        node.raw = codeEl.children?.[0].value;
+      }
+    });
+  };
+}
+
+// Second plugin: Forward raw to pre elements AFTER rehypePrettyCode
+export function rehypeForwardRaw() {
+  return (tree: any) => {
+    visit(tree, (node) => {
+      if (node?.type === "element" && node?.tagName === "figure") {
+        // Check if this is a rehype-pretty-code fragment
+        if (!("data-rehype-pretty-code-figure" in node.properties)) {
+          return;
+        }
+
+        let title;
+        // Copy raw from div to all pre children
+        for (const child of node.children) {
+          if (child.tagName === "figcaption") {
+            // Improved: extract all text from figcaption, not just first child
+            title = child.children
+              .filter((c: any) => c.type === "text")
+              .map((c: any) => c.value)
+              .join("");
+          }
+          if (child.tagName === "pre") {
+            child.properties["raw"] = node.raw;
+            child.properties["title"] = title;
+          }
+        }
+      }
+    });
   };
 }

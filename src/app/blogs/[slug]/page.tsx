@@ -1,16 +1,13 @@
-import { MDXRemote } from "next-mdx-remote/rsc";
 import { getBlogBySlug } from "@/lib/mdx";
 import { format } from "date-fns";
-import { getMDXComponents } from "../../../../mdx-components";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { notFound } from "next/navigation";
-import { MarkdownTable } from "@/components/mdx/markdown-table";
 import Image from "next/image";
 import authorImage from "@/assets/profile.png";
 import { Metadata } from "next";
-import { MarkdownLatex } from "@/components/mdx/markdown-latex";
 import { cache, Suspense } from "react";
 import Loading from "@/app/loading";
+import RemoteMDX from "@/components/shared/remote-mdx";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -77,10 +74,6 @@ export default async function BlogPostPage({
 
   const { content, metadata } = blog;
   const thumbnailImage = metadata.thumbnail;
-  const mdxComponents = getMDXComponents({
-    MarkdownTable: MarkdownTable,
-    MarkdownLatex: MarkdownLatex,
-  });
 
   return (
     <MaxWidthWrapper>
@@ -132,8 +125,8 @@ export default async function BlogPostPage({
           </div>
         </div>
         <Suspense fallback={<Loading />}>
-          <article className="prose-ui !bg-background !text-primary">
-            <MDXRemote source={content} components={mdxComponents} />
+          <article className="text-neutral-800 dark:text-neutral-300">
+            <RemoteMDX content={content} />
           </article>
         </Suspense>
       </div>

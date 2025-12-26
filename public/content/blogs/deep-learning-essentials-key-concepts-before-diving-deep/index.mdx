@@ -48,21 +48,17 @@ A perceptron is a single neuron that takes one or more inputs and, after perform
 
 ## Input
 
-The data you provide to your neuron, perceptron, or neural network. Usually denoted by <MarkdownLatex>{`x_1, x_2, \\dots, x_n`}</MarkdownLatex>. The first layer of a neural network is called the input layer, which contains only the inputs of the network.
+The data you provide to your neuron, perceptron, or neural network. Usually denoted by $$x_1, x_2, \dots, x_n$$. The first layer of a neural network is called the input layer, which contains only the inputs of the network.
 
 ## Weights
 
-Weights are associated with the input of a neuron and determine how impactful that input is. For example, if the first input <MarkdownLatex>{`x_1`}</MarkdownLatex> is 2 and <MarkdownLatex>{`x_2`}</MarkdownLatex> is 4, and their respective weights are <MarkdownLatex>{`w_1 = 3`}</MarkdownLatex> and <MarkdownLatex>{`w_2 = 1`}</MarkdownLatex>, then:
+Weights are associated with the input of a neuron and determine how impactful that input is. For example, if the first input $$x_1$$ is 2 and $$x_2$$ is 4, and their respective weights are $$w_1 = 3$$ and $$w_2 = 1$$, then:
 
-<MarkdownLatex block={true}>
-{`
-x_1 \\times w_1 = 2 \\times 3 = 6 \\\\
-x_2 \\times w_2 = 4 \\times 1 = 4
-`}
-</MarkdownLatex>
-
-
-This means the first input <MarkdownLatex>{`x_1`}</MarkdownLatex> is more impactful than <MarkdownLatex>{`x_2`}</MarkdownLatex>.
+```math
+x_1 \times w_1 = 2 \times 3 = 6 \\
+x_2 \times w_2 = 4 \times 1 = 4
+```
+This means the first input $$x_1$$ is more impactful than $$x_2$$.
 
 ![weight & input.png](/content/blogs/deep-learning-essentials-key-concepts-before-diving-deep/data/weight_input.png)
 
@@ -76,7 +72,7 @@ A layer consists of multiple neurons:
 
 ## Bias
 
-You can think of biases as adjustable knobs that you can tweak according to your needs. Biases are added to the product of the input and weight <MarkdownLatex>{`(x_1 \\times w_1 + b_1)`}</MarkdownLatex>, allowing a neuron to activate even if its inputs are zero. This helps the network learn better and make accurate predictions.
+You can think of biases as adjustable knobs that you can tweak according to your needs. Biases are added to the product of the input and weight $$(x_1 \times w_1 + b_1)$$, allowing a neuron to activate even if its inputs are zero. This helps the network learn better and make accurate predictions.
 
 ![neural_network.png](/content/blogs/deep-learning-essentials-key-concepts-before-diving-deep/data/neural_network.png)
 
@@ -184,12 +180,12 @@ Hyperparameter tuning is the process of finding the optimal combination of setti
 
 Vectorization in deep learning refers to the technique of performing operations on entire arrays of data simultaneously instead of iterating through individual elements. This significantly improves computational efficiency and simplifies code compared to traditional loop-based approaches. It is crucial in deep learning due to the massive datasets and complex calculations involved.
 
--   **Example**: Consider adding two vectors <MarkdownLatex>{`[1, 2, 3]`}</MarkdownLatex> and <MarkdownLatex>{`[4, 5, 6]`}</MarkdownLatex>. Instead of looping over each element and adding them individually, vectorization allows us to perform the addition operation directly on the entire arrays, resulting in <MarkdownLatex>{`[5, 7, 9]`}</MarkdownLatex>.
+-   **Example**: Consider adding two vectors $$[1, 2, 3]$$ and $$[4, 5, 6]$$. Instead of looping over each element and adding them individually, vectorization allows us to perform the addition operation directly on the entire arrays, resulting in $$[5, 7, 9]$$.
 
 ## Broadcasting
 
 Broadcasting is a mechanism that allows arrays of different shapes to be combined in arithmetic operations. It automatically aligns arrays with compatible shapes and dimensions, eliminating the need for explicit copying or reshaping of arrays.
 
--   **Example**: Consider multiplying a 2D array <MarkdownLatex>{`A`}</MarkdownLatex> of shape <MarkdownLatex>{`(3, 3)`}</MarkdownLatex> by a scalar value <MarkdownLatex>5</MarkdownLatex>. Broadcasting allows the scalar value to be automatically expanded to match the shape of <MarkdownLatex>{`A`}</MarkdownLatex>, resulting in element-wise multiplication between <MarkdownLatex>{`A`}</MarkdownLatex> and the scalar value without the need for explicit duplication or reshaping of the scalar.
+-   **Example**: Consider multiplying a 2D array $$A$$ of shape $$(3, 3)$$ by a scalar value $$5$$. Broadcasting allows the scalar value to be automatically expanded to match the shape of $$A$$, resulting in element-wise multiplication between $$A$$ and the scalar value without the need for explicit duplication or reshaping of the scalar.
 
 While this blog provides an overview and a starting point for deep learning, continuous learning, experimentation, and real-world application are key to mastering deep learning and making impactful advancements in the field.

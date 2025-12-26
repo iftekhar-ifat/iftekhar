@@ -19,8 +19,8 @@ So, শুরুতে আমরা একটা folder এ `index.html` না�
 
 এর পর আমরা আমাদের application এ react এড করার জন্য html body তে দুইটা script tag ইউজ করব। ফার্স্ট টা হল react API যার মাধ্যমে আমরা react এর ফাংশন ইউজ করব আর পরের টা হল react-dom যেটা আসলে dom render করবে।
 
-<CodeBlock language="html" showLineNumbers>
-{`<!DOCTYPE html>
+```html showLineNumbers
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -38,13 +38,13 @@ So, শুরুতে আমরা একটা folder এ `index.html` না�
         <!-- React Component -->
         <script src="./src/App.js"></script>
     </body>
-</html>`}
-</CodeBlock>
+</html>
+```
 
 React আর ReactDOM এর script এর নিচে আমাদের আরেকটা script tag লাগবে যেটায় আমরা আমাদের ফার্স্ট react component লিখবো কারণ react এর main premise ই হল ও javascript দিয়ে html render করে। একটু লজিকালি একটু চিন্তা করি, আমার কাছে React আছে যা আমাকে কিছু react api দিবে আর আমার কাছে ReactDOM আছে যার মাধ্যমে আমি HTML render করতে পারি। So high-level ওভারভিউ হল আমি React দিয়ে UI বানাবো আর ReactDOM দিয়ে ওইটা render করবো।
 
-<CodeBlock language="html" showLineNumbers>
-{`<!DOCTYPE html>
+```html showLineNumbers
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -69,8 +69,8 @@ React আর ReactDOM এর script এর নিচে আমাদের আ�
             root.render(React.createElement(App));
         </script>
     </body>
-</html>`}
-</CodeBlock>
+</html>
+```
 
 এখানে App function এ আমরা একটা react element create করলাম, যার ফার্স্ট প্যারামিটার হল, আমি কি ধরনের html render করতে চাই, আমাদের ক্ষেত্রে যা হল একটা “h1” tag. সেকেন্ড প্যারামিটার এ আমার ওই html tag এর কোনো attribute যেমন id বা অন্য কিছু যদি দিতে চাই তাহলে দিতে পারি আর লাস্ট প্যারামিটার টা হল html tag এর ভিতরের content.
 
@@ -78,8 +78,8 @@ React আর ReactDOM এর script এর নিচে আমাদের আ�
 
 এখন আমরা নতুন একটা folder, for example `src` নেই যার মাঝে App.js নাম এ একটা js file নেই যার মাঝে আমাদের component কে নিয়ে যাই আর আমাদের html এর script tag এ App.js এর source দিয়ে দেই।
 
-<CodeBlock language="html" showLineNumbers>
-{`<!DOCTYPE html>
+```html showLineNumbers
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -97,22 +97,21 @@ React আর ReactDOM এর script এর নিচে আমাদের আ�
         <!-- React Component -->
         <script src="./src/App.js"></script>
     </body>
-</html>`}
-</CodeBlock>
-
-<CodeBlock language="js" title="src/App.js" showLineNumbers>
-{`const App = () => {
+</html>
+```
+```js showLineNumbers title="src/App.js"
+const App = () => {
     return React.createElement("h1", {}, "Hello To React from src");
 };
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container);
-root.render(React.createElement(App));`}
-</CodeBlock>
+root.render(React.createElement(App));
+```
 
 আরেকটা component বানানো যাক। App.js file এ আমরা নতুন একটা User component create করি।
 
-<CodeBlock language="js" title="src/App.js" showLineNumbers>
-{`const User = () => {
+```js showLineNumbers title="src/App.js"
+const User = () => {
     return React.createElement("div", {}, [
         React.createElement("h2", {}, "Name: A"),
         React.createElement("h3", {}, "Id: 123"),
@@ -128,18 +127,18 @@ const App = () => {
 
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container);
-root.render(React.createElement(App));`}
-</CodeBlock>
+root.render(React.createElement(App));
+```
 
 এখানে User component একটা div যার ভিতর একটি h2 এবং h3 tag আছে এবং আমাদের App component এ আমরা এইটাকে `React.createElement(User)` দিয়ে কল করছি। এক ই ভাবে আমরা আরও component এড করতে পারি আমাদের react application এ।
 
 এখন দেখা যাক কীভাবে আমরা App থেকে User এ ডাটা pass করতে পারি আর এই ডাটা show করতে পারি।
 
-<CodeBlock language="js" title="src/App.js" showLineNumbers>
-{`const User = (props) => {
+```js showLineNumbers title="src/App.js"
+const User = (props) => {
     return React.createElement("div", {}, [
-        React.createElement("h2", {}, \`Name: ${props.name}\`),
-        React.createElement("h3", {}, \`Id: ${props.id}\`),
+        React.createElement("h2", {}, `Name: ${props.name}`),
+        React.createElement("h3", {}, `Id: ${props.id}`),
     ]);
 };
 
@@ -163,9 +162,8 @@ const App = () => {
 
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container);
-root.render(React.createElement(App));`}
-
-</CodeBlock>
+root.render(React.createElement(App));
+```
 
 এখানে আমরা তিনটা ইউজার create করলাম আর ইউজার গুলার properties এ ডাটা দিয়ে দিলাম যেটা আমরা User component এ collect করে render করলাম। এখন আমরা চাইলেই multiple components add করতে পারি ওইগুলোর props দিতে পারি এবং render করতে পারি।
 
@@ -175,10 +173,10 @@ root.render(React.createElement(App));`}
 
 `npm install react react-dom` command দিয়ে আমরা React r ReactDOM install করে ফেলতে পারি যেটা এত সময় আমরা script tag দিয়ে ইউজ করছিলাম। তাহলে এখন র আমাদের script tag এর কোনো দরকার নেই so আমরা script tag দুইটা কেটে দিতে পারি আর যেহেতু আমরা import export ইউজ করব যা হল ES modules তাই আমাদের index.html এ যেখানে App.js এর script tag আছে ওইখানে `type="module"` দিয়ে দিব। এবং App.js এ এসে আমরা React r ReactDOM import করবো।
 
-<CodeBlock language="js" title="src/App.js" showLineNumbers>
-{`import React from "react";
-import ReactDOM from "react-dom";`}
-</CodeBlock>
+```js showLineNumbers title="src/App.js"
+import React from "react";
+import ReactDOM from "react-dom";
+```
 
 এখন আসা যাক JSX এ। আমরা সবাই ই জানি browser শুধু javascript ই read করতে পারে, এখন আমরা যদি JSX ইউজ করি এইটা ত আর valid javascript না so browser ও এইটা read করতে পারে না। Build tool আমাদের help করে JSX কে regular JS এ convert করতে যেটা browser বুঝবে ( তবে build tool এছাড়া ও অনেক কাজ করে )।
 
@@ -186,30 +184,30 @@ import ReactDOM from "react-dom";`}
 
 `npm install vite@latest` আর `npm install @vitejs/plugin-react@latest` দিয়ে আমরা vite আর vite এর react plugin install করে ফেলি। Vite দিয়ে React ইউজ করার জন্য vite এর ছোটখাটো একটা configuration দরকার হয় এর জন্য আমরা আমাদের project এর root এ `vite.config.js` file খুলে ওইটায়
 
-<CodeBlock language="js" title="vite.config.js" showLineNumbers>
-{`import { defineConfig } from "vite";
+```js showLineNumbers title="vite.config.js"
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
     plugins: [react()],
-});`}
-</CodeBlock>
+});
+```
 
 এই configuration টা দিতে পারি। এইটা জাস্ট ensure করে আমরা vite আর vite এর react plugin ইউজ করতেছি। এখন আমাদের package.json file এ `“dev”: “vite”` নাম এ একটা script এড করি।
 
-<CodeBlock language="json"  showLineNumbers>
-{`"scripts": {
+```json showLineNumbers
+"scripts": {
     "dev": "vite",
     "test": "echo \"Error: no test specified\" && exit 1"
-  }`}
-</CodeBlock>
+  }
+```
 
 এখন চেক করা যাক vite কাজ করছে কিনা। Terminal এ গিয়ে `npm run dev` দিলে vite ready লেখা আসবে r localhost এ একটা port show করবে যেটায় আমাদের আগের react code run করছে।
 
 এখন একে একে আমাদের User আর App component কে যদি আমরা JSX এ convert করি তাহলে দেখা যাক কি হয়। User এর জন্য একটা নিউ `User.jsx` file create করে ফেলি (totally optional).
 
-<CodeBlock language="jsx" title="User.jsx" showLineNumbers>
-{`import React from "react";
+```jsx showLineNumbers title="User.jsx"
+import React from "react";
 
 const User = (props) => {
     return (
@@ -220,13 +218,13 @@ const User = (props) => {
     );
 };
 
-export default User;`}
-</CodeBlock>
+export default User;
+```
 
 `App.js` এখন হয়ে যাবে `App.jsx`. তার সাথে আমাদের `index.html` file এর script এর src তে ও `App.jsx` দিতে হবে কারণ jsx extension থাকলেই vite এই file কে transpile এর সময় consider করবে।
 
-<CodeBlock language="jsx" title="App.jsx" showLineNumbers>
-{`import React from "react";
+```jsx showLineNumbers title="App.jsx"
+import React from "react";
 import ReactDOM from "react-dom";
 import User from "./User";
 
@@ -245,8 +243,8 @@ const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container);
 
 // Remove React.createElement and use JSX component
-root.render(<App />);`}
-</CodeBlock>
+root.render(<App />);
+```
 
 এখন আমরা যদি run করি তাহলে আমরা আমাদের আগের output ই দেখতে পারব। মূলত vite jsx file গুলাকে transpile করে আমাদের আগের লেখা `React.createElement` টাইপ এর er file এ ই convert করে।
 

@@ -42,23 +42,23 @@ Let’s start by setting up our PyTorch environment and loading the FashionMNIST
 
 First, let’s import the necessary libraries:
 
-<CodeBlock language="python" showLineNumbers>
-{`import torch
+```python showLineNumbers
+import torch
 import torchvision
 from torchvision import transforms
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-import numpy as np`}
-</CodeBlock>
+import numpy as np
+```
 
 Next, we need to define some transformations for our images. For grayscale images like FashionMNIST, pixel values typically range from 0 to 255. We’ll transform them into PyTorch tensors, which will automatically scale them to a range between 0 and 1.
 
-<CodeBlock language="python" showLineNumbers>
-{`# Define a transform to convert images to PyTorch tensors
-  transform = transforms.Compose([
-      transforms.ToTensor(),
-  ])`}
-</CodeBlock>
+```python showLineNumbers
+# Define a transform to convert images to PyTorch tensors
+transform = transforms.Compose([
+    transforms.ToTensor(),
+])
+```
 
 <Callout variant="info">
 **A quick note on `transforms.ToTensor()`:** This transformation automatically converts a PIL Image or NumPy `ndarray` to a `FloatTensor` and scales the image pixel intensity values from the range [0, 255] to [0.0, 1.0]. This is a standard practice for preparing image data for neural networks.
@@ -66,41 +66,41 @@ Next, we need to define some transformations for our images. For grayscale image
 
 Now, let’s load the FashionMNIST training and testing datasets and create data loaders. Data loaders are essential in PyTorch for efficiently feeding data to our model in batches during training.
 
-<CodeBlock language="python" showLineNumbers>
-{`# Load the training and test datasets
+```python showLineNumbers
+# Load the training and test datasets
 train_dataset = torchvision.datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
 test_dataset = torchvision.datasets.FashionMNIST(root='./data', train=False, download=True, transform=transform)
 
 # Create data loaders
 batch_size = 64
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)`}
-</CodeBlock>
+test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+```
 
 We’ve set a `batch_size` of 64, meaning our model will process 64 images at a time. `shuffle=True` for the training loader ensures that the data is randomly ordered in each epoch, which helps the model generalize better. For the test loader, `shuffle=False` is typical as we usually want to evaluate performance consistently.
 
 Let’s visualize a few images from our dataset to make sure everything is loaded correctly. Since `ToTensor()` scales pixel values to [0, 1], we can display them directly.
 
-<CodeBlock language="python" showLineNumbers>
-{`# Function to show an image
-  def imshow(img):
-      npimg = img.numpy()
-      plt.imshow(np.transpose(npimg, (1, 2, 0)))
+```python showLineNumbers
+# Function to show an image
+def imshow(img):
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
-  # Get some random training images
-  dataiter = iter(train_loader)
-  images, labels = next(dataiter)
+# Get some random training images
+dataiter = iter(train_loader)
+images, labels = next(dataiter)
 
-  # Show images
-  print('Shape of a batch of images:', images.shape)
-  plt.figure(figsize=(10, 4))
-  for i in range(8):
-      plt.subplot(2, 4, i + 1)
-      imshow(images[i])
-      plt.axis('off')
-  plt.tight_layout()
-  plt.show()`}
-</CodeBlock>
+# Show images
+print('Shape of a batch of images:', images.shape)
+plt.figure(figsize=(10, 4))
+for i in range(8):
+    plt.subplot(2, 4, i + 1)
+    imshow(images[i])
+    plt.axis('off')
+plt.tight_layout()
+plt.show()
+```
 
 ![Dataset Example](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/dataset.png)
 
@@ -120,29 +120,29 @@ In this diagram, you can see the input image being transformed through several c
 
 Let’s define our encoder using PyTorch’s `nn.Module`. We’ll use `nn.Conv2d` layers, which are designed for 2D image data.
 
-<CodeBlock language="python" showLineNumbers>
-{`import torch.nn as nn
+```python showLineNumbers
+import torch.nn as nn
 
-  class Encoder(nn.Module):
-      def __init__(self):
-          super(Encoder, self).__init__()
-          self.encoder = nn.Sequential(
-              # Layer 1: 1 channel -> 16 channels, halves spatial dimensions (28x28 -> 14x14)
-              nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),
-              nn.ReLU(),
+class Encoder(nn.Module):
+    def __init__(self):
+        super(Encoder, self).__init__()
+        self.encoder = nn.Sequential(
+            # Layer 1: 1 channel -> 16 channels, halves spatial dimensions (28x28 -> 14x14)
+            nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
 
-              # Layer 2: 16 channels -> 32 channels, halves again (14x14 -> 7x7)
-              nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1),
-              nn.ReLU(),
+            # Layer 2: 16 channels -> 32 channels, halves again (14x14 -> 7x7)
+            nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
 
-              # Layer 3: 32 channels -> 64 channels, reduces to 3x3 (7x7 -> 3x3)
-              nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=0),
-              nn.ReLU()
-          )
+            # Layer 3: 32 channels -> 64 channels, reduces to 3x3 (7x7 -> 3x3)
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=0),
+            nn.ReLU()
+        )
 
-      def forward(self, x):
-          return self.encoder(x)`}
-</CodeBlock>
+    def forward(self, x):
+        return self.encoder(x)
+```
 
 Let’s break down this convolutional encoder code step by step:
 
@@ -170,31 +170,31 @@ In this diagram, the compressed latent representation is fed into the decoder, w
 
 Let’s define our decoder using PyTorch’s `nn.Module`:
 
-<CodeBlock language="python" showLineNumbers>
-{`import torch.nn as nn
+```python showLineNumbers
+import torch.nn as nn
 
-  class Decoder(nn.Module):
-      def __init__(self):
-          super(Decoder, self).__init__()
-          self.decoder = nn.Sequential(
-              # Layer 1: Upsamples 64-channel latent space -> 32 channels (3x3 -> 7x7)
-              nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2),
-              nn.ReLU(),
+class Decoder(nn.Module):
+    def __init__(self):
+        super(Decoder, self).__init__()
+        self.decoder = nn.Sequential(
+            # Layer 1: Upsamples 64-channel latent space -> 32 channels (3x3 -> 7x7)
+            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2),
+            nn.ReLU(),
 
-              # Layer 2: Upsamples 32 channels -> 16 channels (7x7 -> 14x14)
-              nn.ConvTranspose2d(32, 16, kernel_size=3, stride=2,
-                                padding=1, output_padding=1),
-              nn.ReLU(),
+            # Layer 2: Upsamples 32 channels -> 16 channels (7x7 -> 14x14)
+            nn.ConvTranspose2d(32, 16, kernel_size=3, stride=2,
+                            padding=1, output_padding=1),
+            nn.ReLU(),
 
-              # Layer 3: Upsamples 16 channels -> 1 channel (14x14 -> 28x28)
-              nn.ConvTranspose2d(16, 1, kernel_size=3, stride=2,
-                                padding=1, output_padding=1),
-              nn.Sigmoid()  # Constrains output to [0,1] for image pixels
-          )
+            # Layer 3: Upsamples 16 channels -> 1 channel (14x14 -> 28x28)
+            nn.ConvTranspose2d(16, 1, kernel_size=3, stride=2,
+                            padding=1, output_padding=1),
+            nn.Sigmoid()  # Constrains output to [0,1] for image pixels
+        )
 
-      def forward(self, x):
-          return self.decoder(x)`}
-</CodeBlock>
+    def forward(self, x):
+        return self.decoder(x)
+```
 
 Let’s break down the `Decoder` code:
 
@@ -210,14 +210,11 @@ Let’s break down the `Decoder` code:
 
 ### Dimension Flow:
 
-<MarkdownTable>
-{`
 | Layer | Operation              | Input Shape → Output Shape |
 | ----- | ---------------------- | -------------------------- |
 | 1     | ConvTranspose2d(64→32) | (64, 3, 3) → (32, 7, 7)    |
 | 2     | ConvTranspose2d(32→16) | (32, 7, 7) → (16, 14, 14)  |
-| 3     | ConvTranspose2d(16→1)  | (16, 14, 14) → (1, 28, 28) |`}
-</MarkdownTable>
+| 3     | ConvTranspose2d(16→1)  | (16, 14, 14) → (1, 28, 28) |
 
 The decoder precisely reconstructs the original 28x28 image from the 64-channel latent space.
 
@@ -225,20 +222,20 @@ The decoder precisely reconstructs the original 28x28 image from the 64-channel 
 
 Now that we have both the `Encoder` and `Decoder` components, we can combine them to form our complete `Autoencoder` model. This model will take an input image, encode it into a latent representation, and then decode that representation back into a reconstructed image.
 
-<CodeBlock language="python" showLineNumbers>
-{`class Autoencoder(nn.Module):
-      def __init__(self):
-          super(Autoencoder, self).__init__()
-          self.encoder = Encoder()
-          self.decoder = Decoder()
+```python showLineNumbers
+class Autoencoder(nn.Module):
+    def __init__(self):
+        super(Autoencoder, self).__init__()
+        self.encoder = Encoder()
+        self.decoder = Decoder()
 
-      def forward(self, x):
-          # Encode the input image to get the latent representation
-          encoded = self.encoder(x)
-          # Decode the latent representation to reconstruct the image
-          decoded = self.decoder(encoded)
-          return decoded`}
-</CodeBlock>
+    def forward(self, x):
+        # Encode the input image to get the latent representation
+        encoded = self.encoder(x)
+        # Decode the latent representation to reconstruct the image
+        decoded = self.decoder(encoded)
+        return decoded
+```
 
 In this `Autoencoder` class:
 
@@ -262,8 +259,8 @@ To train our autoencoder, we need two key components:
 
 Let’s set up our training loop. We’ll train the model for a certain number of `epochs`. An epoch means one complete pass through the entire training dataset.
 
-<CodeBlock language="python" showLineNumbers>
-{`import torch.optim as optim
+```python showLineNumbers
+import torch.optim as optim
 
 # Device configuration (use GPU if available, otherwise CPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -299,10 +296,10 @@ for epoch in range(num_epochs):
         running_loss += loss.item()
 
     avg_loss = running_loss / len(train_loader)
-    print(f\"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}\")
+    print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
-print("Training finished!")`}
-</CodeBlock>
+print("Training finished!")
+```
 
 Let’s break down the training code:
 
@@ -322,8 +319,8 @@ Let’s break down the training code:
 
 After training, let’s visualize how well our autoencoder can reconstruct images. We’ll take a few images from the test set, pass them through our trained autoencoder, and then display the original and reconstructed versions side-by-side.
 
-<CodeBlock language="python" showLineNumbers>
-{`# Set the model to evaluation mode
+```python showLineNumbers
+# Set the model to evaluation mode
 model.eval()
 
 # Get a batch of test images
@@ -353,8 +350,8 @@ for i in range(8):
     plt.axis("off")
 
 plt.tight_layout()
-plt.show()`}
-</CodeBlock>
+plt.show()
+```
 
 ![AE reconstructed](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/reconstructed.png)
 
@@ -374,68 +371,69 @@ Here’s where traditional autoencoders fall short:
 
 To illustrate this, let's visualize the latent space learned by our autoencoder using t-SNE (t-Distributed Stochastic Neighbor Embedding). t-SNE is a dimensionality reduction technique that is particularly well-suited for the visualization of high-dimensional datasets. It helps us to see how our autoencoder has organized the different types of fashion items in its compressed latent space.
 
-<CodeBlock language="python" showLineNumbers>
-{`from sklearn.manifold import TSNE
-  import matplotlib.pyplot as plt
+```python showLineNumbers
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
 
-  # Fashion-MNIST class names for reference
-  fashion_classes = [
-      "T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
-      "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"
-  ]
+# Fashion-MNIST class names for reference
+fashion_classes = [
+    "T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
+    "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"
+]
 
-  # Step 1: Get images and labels
-  images, labels = next(iter(test_loader))
-  images = images.to(device)
+# Step 1: Get images and labels
+images, labels = next(iter(test_loader))
+images = images.to(device)
 
-  # Step 2: Pass through encoder to get compressed "summaries"
-  with torch.no_grad():
-      latent = model.encoder(images)
+# Step 2: Pass through encoder to get compressed "summaries"
+with torch.no_grad():
+    latent = model.encoder(images)
 
-  # Step 3: Flatten the summary for t-SNE
-  latent_flat = latent.view(latent.size(0), -1).cpu().numpy()
-  labels = labels.cpu().numpy()
+# Step 3: Flatten the summary for t-SNE
+latent_flat = latent.view(latent.size(0), -1).cpu().numpy()
+labels = labels.cpu().numpy()
 
-  # Step 4: Reduce to 2D for visualization
-  tsne = TSNE(n_components=2, random_state=42)
-  latent_2d = tsne.fit_transform(latent_flat)
+# Step 4: Reduce to 2D for visualization
+tsne = TSNE(n_components=2, random_state=42)
+latent_2d = tsne.fit_transform(latent_flat)
 
-  # Step 5: Plot the 2D latent space
-  plt.figure(figsize=(12, 8))
-  scatter = plt.scatter(latent_2d[:, 0], latent_2d[:, 1], c=labels, cmap='tab10', alpha=0.7)
-  cbar = plt.colorbar(scatter, ticks=range(10))
-  cbar.ax.set_yticklabels(fashion_classes)  # Map class indices to names
-  cbar.set_label('Fashion-MNIST Classes', rotation=270, labelpad=15)
+# Step 5: Plot the 2D latent space
+plt.figure(figsize=(12, 8))
+scatter = plt.scatter(latent_2d[:, 0], latent_2d[:, 1], c=labels, cmap='tab10', alpha=0.7)
+cbar = plt.colorbar(scatter, ticks=range(10))
+cbar.ax.set_yticklabels(fashion_classes)  # Map class indices to names
+cbar.set_label('Fashion-MNIST Classes', rotation=270, labelpad=15)
 
-  plt.title("2D Visualization of the Latent Space (Fashion-MNIST)")
-  plt.xlabel("t-SNE Dimension 1")
-  plt.ylabel("t-SNE Dimension 2")
-  plt.grid(True)
-  plt.tight_layout()
-  plt.show()`}
-</CodeBlock>
+plt.title("2D Visualization of the Latent Space (Fashion-MNIST)")
+plt.xlabel("t-SNE Dimension 1")
+plt.ylabel("t-SNE Dimension 2")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+```
 
 ![Latent Space](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/latent_space.png)
 
 Here you can see a scatter plot where each point represents an image from the test set, positioned according to its learned latent representation. Different colors represent different classes of fashion items. You'll likely observe that the autoencoder has grouped similar items together, forming distinct clusters. However, you might also notice that the space _between_ these clusters is largely empty. Now, what happens if you were to pick a random point from these empty regions and pass it through the decoder? Let's try this,
 
-<CodeBlock language="python" showLineNumbers>
-{`# Get image encodings for a batch (so total 64 images)
-  images, labels = next(iter(test_loader))
-  images = images.to(device)
+```python showLineNumbers
+# Get image encodings for a batch (so total 64 images)
+images, labels = next(iter(test_loader))
+images = images.to(device)
 
-  with torch.no_grad():
-      latent = model.encoder(images)
+with torch.no_grad():
+    latent = model.encoder(images)
 
-  latent_flat = latent.view(latent.size(0), -1).cpu().numpy()
-  labels = labels.cpu().numpy()
+latent_flat = latent.view(latent.size(0), -1).cpu().numpy()
+labels = labels.cpu().numpy()
 
-  # Fit t-SNE only on real points
-  tsne = TSNE(n_components=2, random_state=42)
-  latent_2d = tsne.fit_transform(latent_flat)`}
-</CodeBlock>
-<CodeBlock language="python" showLineNumbers>
-{`# Sample a random latent vector (same shape as real ones)
+# Fit t-SNE only on real points
+tsne = TSNE(n_components=2, random_state=42)
+latent_2d = tsne.fit_transform(latent_flat)
+```
+
+```python showLineNumbers
+# Sample a random latent vector (same shape as real ones)
 random_latent = torch.randn(1, 64, 3, 3).to(device)
 random_latent_flat = random_latent.view(1, -1).cpu().numpy()
 
@@ -446,13 +444,12 @@ all_latents_2d = TSNE(n_components=2, random_state=42).fit_transform(all_latents
 
 # Separate the projected random point
 latent_2d = all_latents_2d[:-1]
-random_point_2d = all_latents_2d[-1]`}
-</CodeBlock>
-
+random_point_2d = all_latents_2d[-1]
+```
 Now let's check if the random value is in the empty space or not.
 
-<CodeBlock language="python" showLineNumbers>
-{`fashion_classes = [
+```python showLineNumbers
+fashion_classes = [
     "T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
     "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"
 ]
@@ -471,23 +468,23 @@ plt.ylabel("t-SNE Dim 2")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
-plt.show()`}
-</CodeBlock>
+plt.show()
+```
 
 ![Random Point on Latent Space](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/latent_space_with_random_point.png)
 
 As we can see, our random value is in the empty space, so let's try to decode it.
 
-<CodeBlock language="python" showLineNumbers>
-{`with torch.no_grad():
-      decoded_image = model.decoder(random_latent)
+```python showLineNumbers
+with torch.no_grad():
+    decoded_image = model.decoder(random_latent)
 
-  plt.figure(figsize=(3, 3))
-  plt.title("Reconstruction from Random Latent Vector")
-  imshow(decoded_image[0].cpu())
-  plt.axis("off")
-  plt.show()`}
-</CodeBlock>
+plt.figure(figsize=(3, 3))
+plt.title("Reconstruction from Random Latent Vector")
+imshow(decoded_image[0].cpu())
+plt.axis("off")
+plt.show()
+```
 
 <div className="flex justify-center">
 ![Random latent vector image](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/ae_reconstructed.png)
@@ -501,7 +498,7 @@ This is where **Variational Autoencoders (VAEs)** come into play. VAEs are a pow
 
 Here's how VAEs solve the problems:
 
-1. **Structured and Continuous Latent Space:** In a VAE, the encoder doesn't output a single latent vector <MarkdownLatex>{`z`}</MarkdownLatex>, but rather two vectors: <MarkdownLatex>{`\\mu`}</MarkdownLatex> (mean) and <MarkdownLatex>{`\\sigma`}</MarkdownLatex> (standard deviation) of a Gaussian distribution. The actual latent vector <MarkdownLatex>{`z`}</MarkdownLatex> is then sampled from this distribution. This forces the encoder to learn a latent space where similar inputs are mapped to similar distributions, and the distributions are encouraged to overlap. This continuity ensures that any point sampled from the latent space will likely correspond to a meaningful data point. The VAE introduces an additional term to its loss function, called the **Kullback-Leibler (KL) Divergence** loss. This loss term encourages the learned latent distributions to be close to a standard normal distribution (mean 0, variance 1). By doing so, it regularizes the latent space, preventing the model from scattering latent representations too widely and ensuring that the latent space is well-behaved and continuous. This is crucial for generating new data, as we can simply sample from a standard normal distribution and pass it through the decoder to get a new, plausible output.
+1. **Structured and Continuous Latent Space:** In a VAE, the encoder doesn't output a single latent vector $$z$$, but rather two vectors: $$\mu$$ (mean) and $$\sigma$$ (standard deviation) of a Gaussian distribution. The actual latent vector $$z$$ is then sampled from this distribution. This forces the encoder to learn a latent space where similar inputs are mapped to similar distributions, and the distributions are encouraged to overlap. This continuity ensures that any point sampled from the latent space will likely correspond to a meaningful data point. The VAE introduces an additional term to its loss function, called the **Kullback-Leibler (KL) Divergence** loss. This loss term encourages the learned latent distributions to be close to a standard normal distribution (mean 0, variance 1). By doing so, it regularizes the latent space, preventing the model from scattering latent representations too widely and ensuring that the latent space is well-behaved and continuous. This is crucial for generating new data, as we can simply sample from a standard normal distribution and pass it through the decoder to get a new, plausible output.
 
 2. **Generative Capability:** Because the latent space is continuous and well-structured, we can now sample _any_ point from a simple distribution (like a standard normal distribution) in the latent space, pass it through the decoder, and expect to get a meaningful and realistic output. This is the key to VAEs' generative power. We can generate entirely new images that were never seen by the model during training, but which share the characteristics of the training data.
 
@@ -515,11 +512,11 @@ Let’s implement a variational autoencoder (VAE) to see how it overcomes the li
 
 Think of a VAE as an upgraded version of our autoencoder. Like before, it has an encoder and a decoder, but with a twist:
 
-- **Encoder:** Instead of producing a single point in the latent space, it outputs two things: a mean <MarkdownLatex>{`(\\mu)`}</MarkdownLatex> and a standard deviation <MarkdownLatex>{`(\\sigma)`}</MarkdownLatex>. These define a probability distribution (usually a Gaussian) for each input image.
+- **Encoder:** Instead of producing a single point in the latent space, it outputs two things: a mean $$\mu$$ and a standard deviation $$\sigma$$. These define a probability distribution (usually a Gaussian) for each input image.
 
-- **Sampling:** We then sample a latent vector <MarkdownLatex>{`z`}</MarkdownLatex> from this distribution using a clever trick called *reparameterization* (more on that in a moment).
+- **Sampling:** We then sample a latent vector $$z$$ from this distribution using a clever trick called *reparameterization* (more on that in a moment).
 
-- **Decoder:** Just like before, the decoder takes this <MarkdownLatex>{`z`}</MarkdownLatex> and reconstructs the image or even generates a new one if we sample <MarkdownLatex>{`z`}</MarkdownLatex> ourselves!
+- **Decoder:** Just like before, the decoder takes this $$z$$ and reconstructs the image or even generates a new one if we sample $$z$$ ourselves!
 
 ![VAE Architecture](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/vae_architecture.png)
 
@@ -527,71 +524,71 @@ The big difference is that VAEs ensure the latent space is smooth and continuous
 
 ## Building the VAE
 
-Since our autoencoder used convolutional layers, we’ll build a convolutional VAE for consistency. The encoder will output both <MarkdownLatex>{`\\mu`}</MarkdownLatex> and <MarkdownLatex>{`\\log(\\sigma^2)`}</MarkdownLatex> (log-variance, which is more stable to compute), and we’ll sample <MarkdownLatex>{`z`}</MarkdownLatex> before passing it to the decoder. Here’s the code:
+Since our autoencoder used convolutional layers, we’ll build a convolutional VAE for consistency. The encoder will output both $$\mu$$ and $$\log(\sigma^2)$$ (log-variance, which is more stable to compute), and we’ll sample $$z$$ before passing it to the decoder. Here’s the code:
 
-<CodeBlock language="python" showLineNumbers>
-{`import torch
-  import torch.nn as nn
-  import torch.nn.functional as F
+```python showLineNumbers
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
-  class VAE(nn.Module):
-      def __init__(self, latent_dim=16):
-          super(VAE, self).__init__()
-          self.latent_dim = latent_dim
+class VAE(nn.Module):
+    def __init__(self, latent_dim=16):
+        super(VAE, self).__init__()
+        self.latent_dim = latent_dim
 
-          # Encoder: outputs mean and log-variance
-          self.encoder = nn.Sequential(
-              nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),
-              nn.ReLU(),
-              nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1),
-              nn.ReLU(),
-              nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=0),
-              nn.ReLU(),
-              nn.Flatten(),
-          )
-          self.fc_mu = nn.Linear(64 * 3 * 3, latent_dim)
-          self.fc_logvar = nn.Linear(64 * 3 * 3, latent_dim)
+        # Encoder: outputs mean and log-variance
+        self.encoder = nn.Sequential(
+            nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=0),
+            nn.ReLU(),
+            nn.Flatten(),
+        )
+        self.fc_mu = nn.Linear(64 * 3 * 3, latent_dim)
+        self.fc_logvar = nn.Linear(64 * 3 * 3, latent_dim)
 
-          # Decoder: reconstructs from latent vector
-          self.decoder_input = nn.Linear(latent_dim, 64 * 3 * 3)
-          self.decoder = nn.Sequential(
-              nn.Unflatten(1, (64, 3, 3)),
-              nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2),
-              nn.ReLU(),
-              nn.ConvTranspose2d(32, 16, kernel_size=3, stride=2, padding=1, output_padding=1),
-              nn.ReLU(),
-              nn.ConvTranspose2d(16, 1, kernel_size=3, stride=2, padding=1, output_padding=1),
-              nn.Sigmoid()
-          )
+        # Decoder: reconstructs from latent vector
+        self.decoder_input = nn.Linear(latent_dim, 64 * 3 * 3)
+        self.decoder = nn.Sequential(
+            nn.Unflatten(1, (64, 3, 3)),
+            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, 16, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(16, 1, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.Sigmoid()
+        )
 
-      def encode(self, x):
-          x = self.encoder(x)
-          mu = self.fc_mu(x)
-          logvar = self.fc_logvar(x)
-          return mu, logvar
+    def encode(self, x):
+        x = self.encoder(x)
+        mu = self.fc_mu(x)
+        logvar = self.fc_logvar(x)
+        return mu, logvar
 
-      def reparameterize(self, mu, logvar):
-          std = torch.exp(0.5 * logvar)  # Convert log-variance to standard deviation
-          eps = torch.randn_like(std)    # Random noise from standard normal
-          return mu + eps * std          # Sample z
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)  # Convert log-variance to standard deviation
+        eps = torch.randn_like(std)    # Random noise from standard normal
+        return mu + eps * std          # Sample z
 
-      def decode(self, z):
-          x = self.decoder_input(z)
-          x = self.decoder(x)
-          return x
+    def decode(self, z):
+        x = self.decoder_input(z)
+        x = self.decoder(x)
+        return x
 
-      def forward(self, x):
-          mu, logvar = self.encode(x)
-          z = self.reparameterize(mu, logvar)
-          reconstructed = self.decode(z)
-          return reconstructed, mu, logvar`}
-</CodeBlock>
+    def forward(self, x):
+        mu, logvar = self.encode(x)
+        z = self.reparameterize(mu, logvar)
+        reconstructed = self.decode(z)
+        return reconstructed, mu, logvar
+```
 
 Let’s break this down:
 
-- **Encoder:** Similar to our autoencoder, but after flattening, we split into two linear layers: one for <MarkdownLatex>{`\\mu`}</MarkdownLatex> and one for <MarkdownLatex>{`\\log(\\sigma^2)`}</MarkdownLatex>. We set `latent_dim=16` to keep the latent space manageable.
-- **Reparameterization Trick:** This is the magic that lets us train with sampling. Instead of sampling directly (which isn’t differentiable), we compute <MarkdownLatex>{`z = \\mu + \\sigma \\cdot \\epsilon`}</MarkdownLatex>, where <MarkdownLatex>{`\\epsilon`}</MarkdownLatex> is random noise from a standard normal distribution. This keeps the gradient flow intact.
-- **Decoder:** Almost identical to our autoencoder’s decoder, turning the sampled <MarkdownLatex>{`z`}</MarkdownLatex> back into an image.
+- **Encoder:** Similar to our autoencoder, but after flattening, we split into two linear layers: one for $$\mu$$ and one for $$\log(\sigma^2)$$. We set `latent_dim=16` to keep the latent space manageable.
+- **Reparameterization Trick:** This is the magic that lets us train with sampling. Instead of sampling directly (which isn’t differentiable), we compute $$z = \mu + \sigma \cdot \epsilon$$, where $$\epsilon$$ is random noise from a standard normal distribution. This keeps the gradient flow intact.
+- **Decoder:** Almost identical to our autoencoder’s decoder, turning the sampled $$z$$ back into an image.
 
 ## Defining the Loss Function
 
@@ -602,22 +599,22 @@ Training a VAE requires balancing two goals: reconstructing the input well and k
 
 Here’s the loss function:
 
-<CodeBlock language="python" showLineNumbers>
-{`def vae_loss(reconstructed, original, mu, logvar):
-      recon_loss = F.mse_loss(reconstructed, original, reduction='sum')
-      kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-      return recon_loss + kl_loss`}
-</CodeBlock>
+```python showLineNumbers
+def vae_loss(reconstructed, original, mu, logvar):
+    recon_loss = F.mse_loss(reconstructed, original, reduction='sum')
+    kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    return recon_loss + kl_loss
+```
 
 - **Reconstruction Loss:** Measures pixel-wise differences, summed across the batch.
-- **KL Divergence:** A mathematical term that regularizes the latent space, keeping <MarkdownLatex>{`\\mu`}</MarkdownLatex> near 0 and <MarkdownLatex>{`\\sigma`}</MarkdownLatex> near 1.
+- **KL Divergence:** A mathematical term that regularizes the latent space, keeping $$\mu$$ near 0 and $$\sigma$$ near 1.
 
 ## Training the VAE
 
 Let’s train it, reusing our FashionMNIST data loaders from earlier:
 
-<CodeBlock language="python" showLineNumbers>
-{`import torch.optim as optim
+```python showLineNumbers
+import torch.optim as optim
 
 # Device setup
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -649,8 +646,8 @@ for epoch in range(num_epochs):
     avg_loss = running_loss / len(train_loader)
     print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
-print("VAE training finished!")`}
-</CodeBlock>
+print("VAE training finished!")
+```
 
 This is similar to our autoencoder training, but now we’re optimizing both reconstruction and KL divergence.
 
@@ -661,28 +658,30 @@ Let’s see what our VAE can do! We’ll check three things: reconstruction, gen
 ### Reconstructing Test Images
 First, let’s reconstruct some test images, just like we did with the autoencoder:
 
-<CodeBlock language="python" showLineNumbers>
-{`vae_model.eval()
-  dataiter = iter(test_loader)
-  images, labels = next(dataiter)
-  images = images.to(device)
+```python showLineNumbers
 
-  with torch.no_grad():
-      reconstructed, _, _ = vae_model(images)
+vae_model.eval()
+dataiter = iter(test_loader)
+images, labels = next(dataiter)
+images = images.to(device)
 
-  plt.figure(figsize=(12, 6))
-  for i in range(8):
-      plt.subplot(2, 8, i + 1)
-      imshow(images[i].cpu())
-      plt.title("Original", fontsize=8)
-      plt.axis("off")
-      plt.subplot(2, 8, i + 9)
-      imshow(reconstructed[i].cpu())
-      plt.title("Reconstructed", fontsize=8)
-      plt.axis("off")
-  plt.tight_layout()
-  plt.show()`}
-</CodeBlock>
+with torch.no_grad():
+    reconstructed, _, _ = vae_model(images)
+
+plt.figure(figsize=(12, 6))
+for i in range(8):
+    plt.subplot(2, 8, i + 1)
+    imshow(images[i].cpu())
+    plt.title("Original", fontsize=8)
+    plt.axis("off")
+    plt.subplot(2, 8, i + 9)
+    imshow(reconstructed[i].cpu())
+    plt.title("Reconstructed", fontsize=8)
+    plt.axis("off")
+plt.tight_layout()
+plt.show()
+
+```
 
 ![VAE Reconstruction Visualization](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/vae_reconstructed.png)
 
@@ -691,21 +690,21 @@ The reconstructions should look pretty good, similar to our autoencoder but with
 ### Generating New Images
 Now, the fun part: generating new fashion items! We’ll sample random points from a standard normal distribution and decode them:
 
-<CodeBlock language="python" showLineNumbers>
-{`num_samples = 8
-  with torch.no_grad():
-      z = torch.randn(num_samples, vae_model.latent_dim).to(device)
-      generated_images = vae_model.decode(z)
+```python showLineNumbers
+num_samples = 8
+with torch.no_grad():
+    z = torch.randn(num_samples, vae_model.latent_dim).to(device)
+    generated_images = vae_model.decode(z)
 
-  plt.figure(figsize=(12, 3))
-  for i in range(num_samples):
-      plt.subplot(1, num_samples, i + 1)
-      imshow(generated_images[i].cpu())
-      plt.title("Generated", fontsize=8)
-      plt.axis("off")
-  plt.tight_layout()
-  plt.show()`}
-</CodeBlock>
+plt.figure(figsize=(12, 3))
+for i in range(num_samples):
+    plt.subplot(1, num_samples, i + 1)
+    imshow(generated_images[i].cpu())
+    plt.title("Generated", fontsize=8)
+    plt.axis("off")
+plt.tight_layout()
+plt.show()
+```
 
 ![VAE Generated Image](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/vae_generated.png)
 
@@ -714,33 +713,33 @@ These are brand-new images, not seen in the training set! They might not be perf
 ### Interpolating Between Images
 Let’s see the smooth transitions VAEs promise. We’ll take two test images, encode them, and interpolate between their latent vectors:
 
-<CodeBlock language="python" showLineNumbers>
-{`img1, _ = test_dataset[0]
-  img2, _ = test_dataset[1]
-  img1 = img1.unsqueeze(0).to(device)
-  img2 = img2.unsqueeze(0).to(device)
+```python showLineNumbers
+img1, _ = test_dataset[0]
+img2, _ = test_dataset[1]
+img1 = img1.unsqueeze(0).to(device)
+img2 = img2.unsqueeze(0).to(device)
 
-  with torch.no_grad():
-      mu1, logvar1 = vae_model.encode(img1)
-      mu2, logvar2 = vae_model.encode(img2)
-      z1 = vae_model.reparameterize(mu1, logvar1)
-      z2 = vae_model.reparameterize(mu2, logvar2)
+with torch.no_grad():
+    mu1, logvar1 = vae_model.encode(img1)
+    mu2, logvar2 = vae_model.encode(img2)
+    z1 = vae_model.reparameterize(mu1, logvar1)
+    z2 = vae_model.reparameterize(mu2, logvar2)
 
-  num_steps = 10
-  interpolated_z = torch.stack([z1 + (z2 - z1) * t for t in torch.linspace(0, 1, num_steps)])
+num_steps = 10
+interpolated_z = torch.stack([z1 + (z2 - z1) * t for t in torch.linspace(0, 1, num_steps)])
 
-  with torch.no_grad():
-      interpolated_images = vae_model.decode(interpolated_z.squeeze(1))
+with torch.no_grad():
+    interpolated_images = vae_model.decode(interpolated_z.squeeze(1))
 
-  plt.figure(figsize=(12, 3))
-  for i in range(num_steps):
-      plt.subplot(1, num_steps, i + 1)
-      imshow(interpolated_images[i].cpu())
-      plt.title(f"Step {i+1}", fontsize=8)
-      plt.axis("off")
-  plt.tight_layout()
-  plt.show()`}
-</CodeBlock>
+plt.figure(figsize=(12, 3))
+for i in range(num_steps):
+    plt.subplot(1, num_steps, i + 1)
+    imshow(interpolated_images[i].cpu())
+    plt.title(f"Step {i+1}", fontsize=8)
+    plt.axis("off")
+plt.tight_layout()
+plt.show()
+```
 
 ![Interpolation Visualization](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/morph.png)
 
@@ -748,73 +747,73 @@ You should see a gradual shift from one item to another like an Ankle boot morph
 
 Finally, let's again plot a random point to our latent space and decode this point using our autoencoder and variational autoencoder model.
 
-<CodeBlock language="python" showLineNumbers>
-{`#  Get latent vectors from VAE
-  vae_model.eval()
-  model.eval()
+```python showLineNumbers
+#  Get latent vectors from VAE
+vae_model.eval()
+model.eval()
 
-  images, labels = next(iter(test_loader))
-  images = images.to(device)
+images, labels = next(iter(test_loader))
+images = images.to(device)
 
-  with torch.no_grad():
-      _, mus, _ = vae_model(images)  # VAE encoder returns mu
-  vae_latents = mus.cpu().numpy()
-  labels = labels.cpu().numpy()
+with torch.no_grad():
+    _, mus, _ = vae_model(images)  # VAE encoder returns mu
+vae_latents = mus.cpu().numpy()
+labels = labels.cpu().numpy()
 
-  # Sample a random AE latent and map to VAE space
-  random_latent_ae = torch.randn(1, 64, 3, 3).to(device)  # Autoencoder latent
-  random_latent_flat = random_latent_ae.view(1, -1)  # Shape: (1, 576)
+# Sample a random AE latent and map to VAE space
+random_latent_ae = torch.randn(1, 64, 3, 3).to(device)  # Autoencoder latent
+random_latent_flat = random_latent_ae.view(1, -1)  # Shape: (1, 576)
 
-  # Create linear mapping to VAE latent dim (16)
-  projection = torch.nn.Linear(576, vae_model.latent_dim).to(device)
-  with torch.no_grad():
-      projected_latent = projection(random_latent_flat)  # Shape: (1, 16)
-  projected_latent_np = projected_latent.cpu().numpy()
+# Create linear mapping to VAE latent dim (16)
+projection = torch.nn.Linear(576, vae_model.latent_dim).to(device)
+with torch.no_grad():
+    projected_latent = projection(random_latent_flat)  # Shape: (1, 16)
+projected_latent_np = projected_latent.cpu().numpy()
 
-  # Plot with t-SNE
-  all_latents = np.vstack([vae_latents, projected_latent_np])
-  latent_2d = TSNE(n_components=2, random_state=42).fit_transform(all_latents)
+# Plot with t-SNE
+all_latents = np.vstack([vae_latents, projected_latent_np])
+latent_2d = TSNE(n_components=2, random_state=42).fit_transform(all_latents)
 
-  # Plot
-  plt.figure(figsize=(12, 8))
-  scatter = plt.scatter(latent_2d[:-1, 0], latent_2d[:-1, 1], c=labels, cmap='tab10', alpha=0.6, label="VAE Encoded")
-  plt.scatter(latent_2d[-1, 0], latent_2d[-1, 1], color='red', marker='X', s=120, label='Projected AE Point')
+# Plot
+plt.figure(figsize=(12, 8))
+scatter = plt.scatter(latent_2d[:-1, 0], latent_2d[:-1, 1], c=labels, cmap='tab10', alpha=0.6, label="VAE Encoded")
+plt.scatter(latent_2d[-1, 0], latent_2d[-1, 1], color='red', marker='X', s=120, label='Projected AE Point')
 
-  cbar = plt.colorbar(scatter, ticks=range(10))
-  cbar.ax.set_yticklabels(fashion_classes)
-  cbar.set_label("Fashion-MNIST Classes", rotation=270, labelpad=15)
+cbar = plt.colorbar(scatter, ticks=range(10))
+cbar.ax.set_yticklabels(fashion_classes)
+cbar.set_label("Fashion-MNIST Classes", rotation=270, labelpad=15)
 
-  plt.title("VAE Latent Space (t-SNE) with Projected AE Random Point")
-  plt.xlabel("t-SNE Dim 1")
-  plt.ylabel("t-SNE Dim 2")
-  plt.legend()
-  plt.grid(True)
-  plt.tight_layout()
-  plt.show()`}
-</CodeBlock>
+plt.title("VAE Latent Space (t-SNE) with Projected AE Random Point")
+plt.xlabel("t-SNE Dim 1")
+plt.ylabel("t-SNE Dim 2")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+```
 
 ![AE VAE latent space](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/ae_vae_latent_space.png)
 
-<CodeBlock language="python" showLineNumbers>
-{`# Decode using both decoders
-  with torch.no_grad():
-      decoded_vae = vae_model.decode(projected_latent.to(device))
-      decoded_ae = model.decoder(random_latent_ae)
+```python showLineNumbers
+# Decode using both decoders
+with torch.no_grad():
+    decoded_vae = vae_model.decode(projected_latent.to(device))
+    decoded_ae = model.decoder(random_latent_ae)
 
-  # Display side-by-side
-  fig, axs = plt.subplots(1, 2, figsize=(6, 3))
-  axs[0].imshow(decoded_vae[0][0].cpu())
-  axs[0].set_title("VAE Decoded")
-  axs[0].axis("off")
+# Display side-by-side
+fig, axs = plt.subplots(1, 2, figsize=(6, 3))
+axs[0].imshow(decoded_vae[0][0].cpu())
+axs[0].set_title("VAE Decoded")
+axs[0].axis("off")
 
-  axs[1].imshow(decoded_ae[0][0].cpu())
-  axs[1].set_title("AE Decoded")
-  axs[1].axis("off")
+axs[1].imshow(decoded_ae[0][0].cpu())
+axs[1].set_title("AE Decoded")
+axs[1].axis("off")
 
-  plt.suptitle("Comparison of Decoded Random Latent Vector")
-  plt.tight_layout()
-  plt.show()`}
-</CodeBlock>
+plt.suptitle("Comparison of Decoded Random Latent Vector")
+plt.tight_layout()
+plt.show()
+```
 
 <div className="flex justify-center">
 ![AE and VAE comparison](/content/blogs/neural-compression-techniques-building-autoencoders-and-vaes/data/vae_ae_comparison.png)

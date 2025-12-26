@@ -9,7 +9,7 @@ featured: false
 
 ## What is a HashTable?
 
-A **HashTable** (or **hash map**) is one of the most powerful and widely used data structures. What makes hash tables so important is their ability to perform **constant-time** (_O(1)_) operations for lookup, insertion, deletion, and update. They store data in **key-value** pairs.
+A **HashTable** (or **hash map**) is one of the most powerful and widely used data structures. What makes hash tables so important is their ability to perform **constant-time** O(1) operations for lookup, insertion, deletion, and update. They store data in **key-value** pairs.
 
 For example, if you want to store students' marks by their student ID, you might organize entries like this:
 
@@ -24,16 +24,15 @@ Although keys can be of any type—strings, numbers, or even objects—the key m
 
 A **hash function** maps an input key _x_ to an integer within a fixed range (the hash table's size). For example, here's a simple JavaScript implementation that hashes strings to values less than 50:
 
-<CodeBlock language="js" title="Hash Function" showLineNumbers>
-  {`function hashFunction(str) {
+```js showLineNumbers
+function hashFunction(str) {
   let sumOfAscii = 0;
   for (let i = 0; i < str.length; i++) {
     sumOfAscii += str.charCodeAt(i);
   }
   return sumOfAscii % 50;
-}`}
-</CodeBlock>
-
+}
+```
 - `hashFunction("ABC")` → 48
 - `hashFunction("BB")` → 32
 - `hashFunction("abg")` → 48

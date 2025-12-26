@@ -1,16 +1,13 @@
-import { MDXRemote } from "next-mdx-remote/rsc";
 import { getProjectBySlug } from "@/lib/mdx";
-import { getMDXComponents } from "../../../../mdx-components";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { notFound } from "next/navigation";
-import { MarkdownTable } from "@/components/mdx/markdown-table";
 import Image from "next/image";
 import { Metadata } from "next";
-import { MarkdownLatex } from "@/components/mdx/markdown-latex";
 import TechStackBadge from "@/components/shared/tech-stack-badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "lucide-react";
-import { TechIcons } from "@/components/shared/tech-icons";
+import TechIcons from "@/components/shared/tech-icons";
+import RemoteMDX from "@/components/shared/remote-mdx";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -72,11 +69,6 @@ export default async function ProjectPage({
 
   const { content, metadata } = project;
   const thumbnailImage = metadata.thumbnail;
-  const mdxComponents = getMDXComponents({
-    TechStackBadge: TechStackBadge,
-    MarkdownTable: MarkdownTable,
-    MarkdownLatex: MarkdownLatex,
-  });
 
   return (
     <MaxWidthWrapper>
@@ -123,8 +115,8 @@ export default async function ProjectPage({
           </div>
         </div>
 
-        <article className="prose-ui !bg-background !text-primary">
-          <MDXRemote source={content} components={mdxComponents} />
+        <article className="text-neutral-800 dark:text-neutral-300">
+          <RemoteMDX content={content} />
         </article>
       </div>
     </MaxWidthWrapper>

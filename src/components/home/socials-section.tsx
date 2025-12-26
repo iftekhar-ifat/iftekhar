@@ -1,13 +1,13 @@
 import React from "react";
 import { Code, MapPin, Mail, Clock2 } from "lucide-react";
 import { Icons } from "../icons";
-import { TechIcons } from "../shared/tech-icons";
 import {
   RelativeTime,
   RelativeTimeZone,
   RelativeTimeZoneDate,
   RelativeTimeZoneDisplay,
 } from "../ui/relative-time";
+import TechIcons from "../shared/tech-icons";
 
 const USER_DATA = {
   working: "Working on computer vision",

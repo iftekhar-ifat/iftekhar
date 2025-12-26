@@ -13,26 +13,26 @@ Let's opt for the **Linear Regression** model to train our dataset. Why choose L
 
 We can easily train Linear Regression using scikit-learn.
 
-<CodeBlock language="python" showLineNumbers>
-{`from sklearn.linear_model import LinearRegression
+```python showLineNumbers
+from sklearn.linear_model import LinearRegression
 
 # Create a Linear Regression model
 model = LinearRegression()
 
 # Fitting the model to the training data
-model.fit(X_train, y_train)`}
-</CodeBlock>
+model.fit(X_train, y_train)
+```
 
 Here the _model.fit()_ function takes the training **feature** and **target** as parameters.
 
 **Congratulations 🎉,** you have just successfully trained your first machine-learning model. Now, let's evaluate how this model performs on our test dataset. We'll feed our model with X_test (test features) and expect it to return the target value. To achieve this,
 
-<CodeBlock language="python" showLineNumbers>
-{`# Predicting house prices on the test data
+```python showLineNumbers
+# Predicting house prices on the test data
 y_pred = model.predict(X_test)
 
-y_pred`}
-</CodeBlock>
+y_pred
+```
 
 Here the _“y_pred”_ returns an array of house prices according to the predicted features (X_test). Here is a graph showing the entire process.
 
@@ -42,40 +42,40 @@ Now, there are various methods available for comparing our predicted values `y_p
 
 Let’s evaluate the model score,
 
-<CodeBlock language="python" showLineNumbers>
-  {`score = model.score(X_test,y_test)
-print("Model Score:", score*100)`}
-</CodeBlock>
+```python showLineNumbers
+score = model.score(X_test,y_test)
+print("Model Score:", score*100)
+```
 
 Hold on, what's this❗ Only 3%? It seems like something is going wrong. Let's delve into our dataset to gain a clearer understanding of what's happening.
 
 Let’s plot actual prices and predicted prices and see what is going on
 
-<CodeBlock language="python" showLineNumbers>
-  {`import matplotlib.pyplot as plt
+```python showLineNumbers
+import matplotlib.pyplot as plt
+
 plt.scatter(y_test, y_pred, alpha=1)
 plt.plot([min(y_test), max(y_test)], [min(y_pred), max(y_pred)], color='red', linewidth=2)
 plt.xlabel('Actual Prices')
 plt.ylabel('Predicted Prices')
 plt.title('Actual Prices vs. Predicted Prices')
 plt.grid(True)
-plt.show()`}
-</CodeBlock>
+plt.show()
+```
 
 ![pred_actual](/content/blogs/practical-machine-learning-part-4/data/pred_actual.png)
 
 Here, the 🔴red line represents our predicted prices line, but our goal is to achieve a line resembling the 🟢green line. So, let's investigate what's happening with our data. A more effective way to analyze the data is by creating a heatmap. Heatmaps are frequently used in machine learning to visualize the pairwise correlations between features (columns) in a dataset. These correlation heatmaps assist in identifying which features exhibit strong positive or negative correlations with each other.
 
-<CodeBlock language="python" showLineNumbers>
-{`import seaborn as sns
+```python showLineNumbers
+import seaborn as sns
 
 plt.figure(figsize=(16, 10))
 sns.heatmap(dataframe.corr(), annot=True)
 plt.title('Heat Map', size=20)
 plt.yticks(rotation = 0)
-plt.show()`}
-
-</CodeBlock>
+plt.show()
+```
 
 ![heatmap](/content/blogs/practical-machine-learning-part-4/data/heatmap.png)
 
@@ -83,8 +83,8 @@ The first thing we can see is that the country class has no effect on prices. _(
 
 Let’s check our price range
 
-<CodeBlock language="python" showLineNumbers>
-{`# Calculate the price range
+```python showLineNumbers
+# Calculate the price range
 max_price = dataframe['price'].max()
 min_price = dataframe['price'].min()
 
@@ -93,14 +93,13 @@ print("Min price:", min_price)
 
 # output
 # Max price: 26590000.0
-# Min price: 0.0`}
-
-</CodeBlock>
+# Min price: 0.0
+```
 
 From this analysis, we can observe that there are houses priced at $0, which is an outlier. To address this issue, let's replace all rows where the house price is $0 with the calculated average price:
 
-<CodeBlock language="python" showLineNumbers>
-{`# Calculate the price range
+```python showLineNumbers
+# Calculate the price range
 max_price = dataframe['price'].max()
 min_price = dataframe['price'].min()
 
@@ -109,25 +108,24 @@ print("Min price:", min_price)
 
 # output
 # Max price: 26590000.0
-# Min price: 0.0`}
-</CodeBlock>
+# Min price: 0.0
+```
 
-<CodeBlock language="python" showLineNumbers>
-{`# Calculate the average price excluding rows where the price is 0
+```python showLineNumbers
+# Calculate the average price excluding rows where the price is 0
 average_price = dataframe[dataframe['price'] != 0]['price'].mean()
 
 # Replace 0 values with the calculated average price
-dataframe['price'] = dataframe['price'].replace(0, average_price)`}
-
-</CodeBlock>
+dataframe['price'] = dataframe['price'].replace(0, average_price)
+```
 
 Similarly, we can apply a similar approach to investigate the bedroom range.
 
-<CodeBlock language="python" showLineNumbers>
-{`dataframe['bedrooms'].value_counts()`}
-</CodeBlock>
+```python showLineNumbers
+dataframe['bedrooms'].value_counts()
+```
 
-```json
+```planetext
 # Output
 # 3 2032
 # 4 1531
@@ -143,13 +141,12 @@ Similarly, we can apply a similar approach to investigate the bedroom range.
 
 In our dataset, we can identify potential outliers by examining the number of bedrooms. Specifically, there are only 2 rows with 8 bedrooms, 1 row with 9 bedrooms, and 1 row with 0 bedrooms. We can just remove these rows:
 
-<CodeBlock language="python" showLineNumbers>
-{`rows_to_remove = dataframe[(dataframe['bedrooms'] == 0) | (dataframe['bedrooms'] == 8)  | (dataframe['bedrooms'] == 9)].index
+```python showLineNumbers
+rows_to_remove = dataframe[(dataframe['bedrooms'] == 0) | (dataframe['bedrooms'] == 8)  | (dataframe['bedrooms'] == 9)].index
 
 # Remove rows with a price of 0 using the drop method
-dataframe = dataframe.drop(rows_to_remove)`}
-
-</CodeBlock>
+dataframe = dataframe.drop(rows_to_remove)
+```
 
 Now, let's re-run our model and assess whether it shows improvement or not.
 
@@ -157,10 +154,10 @@ Now, let's re-run our model and assess whether it shows improvement or not.
 
 Additionally, another approach we can try is shuffling our dataset. Currently, our model is trained on the first 80% of the data and tested on the remaining 20%. This may pose an issue. For example, consider a math exam where there are 100 problems in the syllabus. If you've only practiced the first 60 problems, there's a higher chance that the exam questions might come from the remaining 40 problems. However, if you had practiced randomly from all 100 problems, your chances of encountering familiar problems would be higher. Similarly, our model might perform better if it is trained on a shuffled dataset. Thus, let's shuffle our dataset and evaluate if this improves our model's performance or not.
 
-<CodeBlock language="python" showLineNumbers>
-  {`# Shuffle the DataFrame
-dataframe = dataframe.sample(frac=1, random_state=42)`}
-</CodeBlock>
+```python showLineNumbers
+# Shuffle the DataFrame
+dataframe = dataframe.sample(frac=1, random_state=42)
+```
 
 Now, let's run the model again. What! It's now performing at 60%. We've managed to boost our model's accuracy from 20% to 60% with just one line of code—simply by shuffling our dataset. This underscores the significance of data preprocessing. Typically, data preprocessing is conducted prior to model training. There are various data preprocessing techniques, such as data cleaning, data transformation, data reduction, feature selection, feature scaling, data imputation, and more. These techniques can often have a substantial impact on improving the accuracy and robustness of our machine-learning models. While it's impossible to cover all of them in a single blog, the exploration of these tricks and techniques is up to you. They can be instrumental in making your machine-learning models more accurate and reliable.
 

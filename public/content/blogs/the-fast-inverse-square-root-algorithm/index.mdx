@@ -15,8 +15,8 @@ So, in that case, what would a typical programmer do? Yes, they completely rewri
 
 Here's the exact code snippet from the `q_math.c` file:
 
-<CodeBlock language="c" showLineNumbers>
-{`float Q_rsqrt( float number ) {
+```c showLineNumbers
+float Q_rsqrt( float number ) {
     long i;
     float x2, y;
     const float threehalfs = 1.5F;
@@ -30,8 +30,8 @@ Here's the exact code snippet from the `q_math.c` file:
     // y  = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
 
     return y;
-}`}
-</CodeBlock>
+}
+```
 
 Here is the full [source code](https://github.com/id-Software/Quake-III-Arena) of Quake-III-Arena.
 
@@ -50,23 +50,24 @@ Here's an example of calculating the square root using Newton's method:
 
 **Iteration 1:**
 
-<MarkdownLatex>{`x_1 = \\dfrac{1}{2} \\left( x_0 + \\dfrac{a}{x_0} \\right) = \\dfrac{1}{2} \\left( 3 + \\dfrac{25}{3} \\right) = \\dfrac{1}{2} \\cdot \\dfrac{11.333}{1} \\approx 5.6667`}</MarkdownLatex>
+$$x_1 = \dfrac{1}{2} \left( x_0 + \dfrac{a}{x_0} \right) = \dfrac{1}{2} \left( 3 + \dfrac{25}{3} \right) = \dfrac{1}{2} \cdot \dfrac{11.333}{1} \approx 5.6667$$
+
 
 **Iteration 2:**
 
-<MarkdownLatex>{`x_2 = \\dfrac{1}{2} \\left( x_1 + \\dfrac{a}{x_1} \\right) = \\dfrac{1}{2} \\left( 5.6667 + \\dfrac{25}{5.6667} \\right) \\approx 5.0392`}</MarkdownLatex>
+$$x_2 = \dfrac{1}{2} \left( x_1 + \dfrac{a}{x_1} \right) = \dfrac{1}{2} \left( 5.6667 + \dfrac{25}{5.6667} \right) \approx 5.0392$$
 
 **Iteration 3:**
 
-<MarkdownLatex>{`x_3 = \\dfrac{1}{2} \\left( x_2 + \\dfrac{a}{x_2} \\right) = \\dfrac{1}{2} \\left( 5.0392 + \\dfrac{25}{5.0392} \\right) \\approx 5.0001`}</MarkdownLatex>
+$$x_3 = \dfrac{1}{2} \left( x_2 + \dfrac{a}{x_2} \right) = \dfrac{1}{2} \left( 5.0392 + \dfrac{25}{5.0392} \right) \approx 5.0001 $$
 
 **Iteration 4:**
 
-<MarkdownLatex>{`x_4 = \\dfrac{1}{2} \\left( x_3 + \\dfrac{a}{x_3} \\right) = \\dfrac{1}{2} \\left( 5.0001 + \\dfrac{25}{5.0001} \\right) \\approx 5.0000`}</MarkdownLatex>
+$$x_4 = \dfrac{1}{2} \left( x_3 + \dfrac{a}{x_3} \right) = \dfrac{1}{2} \left( 5.0001 + \dfrac{25}{5.0001} \right) \approx 5.0000$$
 
 **Inverse Square Root:**
 
-<MarkdownLatex>{`answer = \\dfrac{1}{x_4} \\approx 0.2`}</MarkdownLatex>
+$$answer = \dfrac{1}{x_4} \approx 0.2$$
 
 At first glance, this appears to be a generally efficient approach, but computational costs rise in applications like 3D graphics rendering, where vector normalization necessitates frequent inverse square root calculations for each vertex or pixel. After all, we're talking about a time when GPUs didn't exist and CPUs were much slower compared to what they are today. As can be seen, traditional methods for calculating the inverse square root require multiple arithmetic operations (including costly division) in each iteration.
   
@@ -84,55 +85,53 @@ The fast inverse square root algorithm is a clever trick that trades precision f
 
 Let's break down the code step by step:
 
-<CodeBlock language="c" showLineNumbers>
-{`float Q_rsqrt( float number ) {
+```c showLineNumbers
+float Q_rsqrt( float number ) {
     long i;
     float x2, y;
-    const float threehalfs = 1.5F;`}
-</CodeBlock>
+    const float threehalfs = 1.5F;
+```
 
 First, we declare some variables: `i` as a long integer, `x2` and `y` as floating-point numbers, and `threehalfs` as a constant float with the value `1.5`.
 
-<CodeBlock language="c" showLineNumbers>
-{`x2 = number * 0.5F;
-y  = number;`}
-</CodeBlock>
+```c showLineNumbers
+    x2 = number * 0.5F;
+    y  = number;
+```
 
 Next, we calculate `x2` by multiplying the input `number` by `0.5F` (which is the same as dividing by 2). We also store the original `number` in `y`.
 
-<CodeBlock language="c" showLineNumbers>
-{`i  = * ( long * ) &y;     // bit-level hack`}
-</CodeBlock>
+```c showLineNumbers
+    i  = * ( long * ) &y;     // bit-level hack
+```
 
 Here's where the magic happens! We take the memory address of `y` and interpret it as a pointer to a `long` integer (using the cast `(long *)&y`). This allows us to access the bit pattern of the floating-point number `y` as if it were a long integer. This is known as "bit-level hacking" or "type punning," and it's a common trick used in low-level programming.
 
-<CodeBlock language="c" showLineNumbers>
-{`i  = 0x5f3759df - ( i >> 1 );     // magic constant!`}
-</CodeBlock>
+```c showLineNumbers
+    i  = 0x5f3759df - ( i >> 1 );     // magic constant!
+```
 
 Now, we perform some bit manipulation on the long integer `i`. First, we shift the bits of `i` to the right by one position. This is equivalent to dividing the value by 2. Then, we subtract this shifted value from the hexadecimal constant `0x5f3759df`. This constant is a "magic number" that was carefully chosen to provide a good initial approximation for the inverse square root.
 
-<CodeBlock language="c" showLineNumbers>
-{`y  = * ( float * ) &i;`}
-</CodeBlock>
+```c showLineNumbers
+    y  = * ( float * ) &i;
+```
 
 After the bit manipulation, we write the modified `i` value back to memory, but this time we interpret it as a floating-point number by casting the address of `i` to a `float` pointer (`(float *)&i`). This gives us the initial approximation of the inverse square root, stored in `y`.
 
-
-<CodeBlock language="c" showLineNumbers>
-{`y  = y * ( threehalfs - ( x2 * y * y ) );      // 1st iteration
-// y  = y * ( threehalfs - ( x2 * y * y ) );    // 2nd iteration, this can be removed`}
-</CodeBlock>
-
+```c showLineNumbers
+    y  = y * ( threehalfs - ( x2 * y * y ) );      // 1st iteration
+    // y  = y * ( threehalfs - ( x2 * y * y ) );    // 2nd iteration, this can be removed
+```
 
 Finally, we refine the approximation by performing one or two iterations of a polynomial approximation. The expression `(threehalfs - (x2 * y * y))` is a carefully chosen polynomial that, when multiplied with the initial approximation `y`, gives a better approximation of the inverse square root.
 
 The commented-out line shows a second iteration of the same polynomial approximation, which would provide a more accurate result but at the cost of additional computations.
 
-<CodeBlock language="c" showLineNumbers>
-{`    return y;
-}`}
-</CodeBlock>
+```c showLineNumbers
+    return y;
+}
+```
 
 After the approximation is computed, we simply return the final value of `y`, which is our fast inverse square root approximation.
 

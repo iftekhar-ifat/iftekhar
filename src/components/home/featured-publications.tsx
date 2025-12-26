@@ -1,12 +1,10 @@
 import { getFeaturedPublications } from "@/lib/mdx";
-import { MDXRemote } from "next-mdx-remote/rsc";
 import { notFound } from "next/navigation";
 import React from "react";
-import { getMDXComponents } from "../../../mdx-components";
-import PublicationType from "../publication-type";
 import { Timeline, TimelineHeader, TimelineItem } from "../ui/timeline";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import RemoteMDX from "../shared/remote-mdx";
 
 export default async function FeaturedPublications() {
   const { publications } = await getFeaturedPublications();
@@ -24,10 +22,6 @@ export default async function FeaturedPublications() {
 
   const featuredPublicationItems = extractPublications(publications?.content);
 
-  const mdxComponents = getMDXComponents({
-    PublicationType: PublicationType,
-  });
-
   return (
     <div className="font-mono max-w-full">
       <div className="flex items-center mb-4">
@@ -37,8 +31,8 @@ export default async function FeaturedPublications() {
         {featuredPublicationItems.map((publication, index) => (
           <TimelineItem key={index} className="pb-4">
             <TimelineHeader>
-              <div className="prose-ui [&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
-                <MDXRemote source={publication} components={mdxComponents} />
+              <div className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
+                <RemoteMDX content={publication} />
               </div>
             </TimelineHeader>
           </TimelineItem>

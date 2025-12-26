@@ -7,8 +7,6 @@ import {
   TimelineItem,
   TimelineTitle,
 } from "../ui/timeline";
-import { getMDXComponents } from "../../../mdx-components";
-import { MDXRemote } from "next-mdx-remote/rsc";
 import {
   Status,
   StatusIndicator,
@@ -17,6 +15,7 @@ import {
 } from "../ui/status";
 import { cn } from "@/lib/utils";
 import { ExpandableWrapper } from "../shared/expandable-wrapper";
+import RemoteMDX from "../shared/remote-mdx";
 
 type TimelineData = {
   id: number;
@@ -61,7 +60,6 @@ const timelineData: TimelineData[] = [
 ];
 
 export default function UpdatesSection() {
-  const mdxComponents = getMDXComponents({});
   return (
     <div className="font-mono max-w-full">
       <div className="flex items-center mb-4">
@@ -90,11 +88,8 @@ export default function UpdatesSection() {
               </TimelineHeader>
               {item.description && (
                 <TimelineDescription>
-                  <div className="prose-ui [&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
-                    <MDXRemote
-                      source={item.description}
-                      components={mdxComponents}
-                    />
+                  <div className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
+                    <RemoteMDX content={item.description} />
                   </div>
                 </TimelineDescription>
               )}
