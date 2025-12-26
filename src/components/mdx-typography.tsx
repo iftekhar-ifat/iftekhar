@@ -140,11 +140,21 @@ export function pre({
 export function Figure(props: ImageProps) {
   const { width, height, alt } = props;
 
-  if (width === undefined || height === undefined) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={props.src as string} alt={alt ?? ""} />;
+  if (width === undefined && height === undefined) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={props.src as string} alt={alt ?? ""} className="rounded-sm" />
+    );
   }
-  return <Image {...props} alt={alt ?? ""} width={width} height={height} />;
+  return (
+    <Image
+      {...props}
+      alt={alt ?? ""}
+      width={width}
+      height={0}
+      className="rounded-sm"
+    />
+  );
 }
 
 export function img(props: ImageProps) {
@@ -159,6 +169,7 @@ export function img(props: ImageProps) {
         width: "100%",
         height: "auto", // Maintains aspect ratio
       }}
+      className="rounded-sm"
     />
   );
 }
