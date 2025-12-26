@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import matter, { language } from "gray-matter";
+import matter from "gray-matter";
 import { IconSlug } from "@/components/shared/tech-icons";
 import { visit } from "unist-util-visit";
 
@@ -258,6 +258,7 @@ export async function getProjectBySlug(
 
 // First plugin: Extract raw code BEFORE rehypePrettyCode
 export function rehypeExtractRaw() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tree: any) => {
     visit(tree, (node) => {
       if (node?.type === "element" && node?.tagName === "pre") {
@@ -273,6 +274,7 @@ export function rehypeExtractRaw() {
 
 // Second plugin: Forward raw to pre elements AFTER rehypePrettyCode
 export function rehypeForwardRaw() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tree: any) => {
     visit(tree, (node) => {
       if (node?.type === "element" && node?.tagName === "figure") {
@@ -287,7 +289,9 @@ export function rehypeForwardRaw() {
           if (child.tagName === "figcaption") {
             // Improved: extract all text from figcaption, not just first child
             title = child.children
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               .filter((c: any) => c.type === "text")
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               .map((c: any) => c.value)
               .join("");
           }

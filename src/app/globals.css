@@ -153,11 +153,11 @@ code[data-line-numbers-max-digits="3"] > [data-line]::before {
   width: 2rem;
 }
 
-code[data-theme*=" "] span {
+code[data-theme] span {
   color: var(--shiki-light);
 }
 
-html.dark code[data-theme*=" "] span {
+html.dark code[data-theme] span {
   color: var(--shiki-dark);
 }
 

@@ -59,7 +59,7 @@ export default function RootLayout({
           </main>
         </ThemeProvider>
       </body>
-      {/* <Analytics /> */}
+      <Analytics />
     </html>
   );
 }
