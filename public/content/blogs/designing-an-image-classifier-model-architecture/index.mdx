@@ -313,16 +313,12 @@ In **Max Pooling**, we take the **maximum value** from each window (sub-region).
 
 ### Step-by-step Max Pooling:
 
-<MarkdownTable>
-{`
 | Region           | Max Value |
 | ---------------- | --------- |
 | (1, 2, 5, 6)     | **6**     |
 | (3, 4, 7, 8)     | **8**     |
 | (9, 10, 13, 14)  | **14**    |
 | (11, 12, 15, 16) | **16**    |
-`}
-</MarkdownTable>
 
 #### Final Max-Pooled Output:
 
@@ -344,16 +340,12 @@ Instead of taking the max value, **Average Pooling** takes the **average** of al
 
 ### Step-by-step Average Pooling:
 
-<MarkdownTable>
-{`
 | Region           | Average Value |
 | ---------------- | ------------- |
 | (1, 2, 5, 6)     | **3.5**       |
 | (3, 4, 7, 8)     | **5.5**       |
 | (9, 10, 13, 14)  | **11.5**      |
 | (11, 12, 15, 16) | **13.5**      |
-`}
-</MarkdownTable>
 
 #### Final Average-Pooled Output:
 
@@ -386,15 +378,11 @@ Instead of using a small window, **Global Pooling** applies pooling over the ent
 
 ### When to Use Which Pooling?
 
-<MarkdownTable>
-{`
 | Type of Pooling     | Pros                                   | Cons                             |
 | ------------------- | -------------------------------------- | -------------------------------- |
 | **Max Pooling**     | Keeps dominant features, reduces size  | May lose less intense features   |
 | **Average Pooling** | Retains more information               | Less emphasis on strong features |
 | **Global Pooling**  | Reduces feature maps to a single value | May lose spatial details         |
-`}
-</MarkdownTable>
 
 Max pooling is the most commonly used in CNNs since it captures the most important features effectively.
 
