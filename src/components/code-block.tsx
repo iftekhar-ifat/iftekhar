@@ -39,15 +39,11 @@ export function CodeBlock({ children, title, rawCode }: Props) {
         </div>
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={copyToClipboard}
           aria-label="Copy code"
         >
-          {copied ? (
-            <Check className="h-4 w-4 text-emerald-500" />
-          ) : (
-            <Copy className="h-4 w-4" />
-          )}
+          {copied ? <Check className="text-emerald-500" /> : <Copy />}
         </Button>
       </div>
       <ScrollArea>
