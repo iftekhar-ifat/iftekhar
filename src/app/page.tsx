@@ -1,3 +1,4 @@
+import EventsSection from "@/components/home/events-section";
 import FeaturedBlogs from "@/components/home/featured-blogs";
 import FeaturedPublications from "@/components/home/featured-publications";
 import IntroSection from "@/components/home/intro-section";
@@ -17,6 +18,8 @@ export default function Home() {
         <UpdatesSection />
         <Separator />
         <FeaturedPublications />
+        <Separator />
+        <EventsSection />
         <Separator />
         <SkillSection />
         <Separator />
