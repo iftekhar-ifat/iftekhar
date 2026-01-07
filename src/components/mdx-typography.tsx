@@ -107,6 +107,8 @@ export function a({
     <a
       className="text-blue-500 dark:text-blue-400 underline underline-offset-4 decoration-blue-500/35 transition-colors duration-150 hover:text-cyan-500 dark:hover:text-cyan-500 hover:decoration-cyan-500/70 active:text-cyan-500 focus-visible:rounded focus-visible:outline focus-visible:outline-cyan-500 focus-visible:outline-offset-2"
       {...props}
+      target="_blank"
+      rel="noopener noreferrer"
     >
       {children}
     </a>
