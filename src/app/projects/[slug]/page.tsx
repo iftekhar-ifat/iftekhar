@@ -76,7 +76,7 @@ export default async function ProjectPage({
         <div className="relative w-full h-auto border rounded-xl">
           <Image
             src={thumbnailImage}
-            alt="Blog thumbnail"
+            alt="Project thumbnail"
             width={1200}
             height={630}
             className="w-full h-auto rounded-xl object-contain"
@@ -86,7 +86,7 @@ export default async function ProjectPage({
           <h1 className="scroll-m-20 my-4 text-3xl font-extrabold tracking-tight text-balance">
             {metadata.title}
           </h1>
-          <div className="space-x-2">
+          <div className="flex gap-2">
             {metadata.links.map((link, index) => (
               <Button
                 key={`${link.type}-${index}`}

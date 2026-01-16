@@ -1,7 +1,59 @@
 ---
-title: "LU CP Archive"
-description: "Learn why MDX gives you superpowers in content + component workflows."
+title: "LU Competitive Programming Archive"
+description: "A full-stack competitive programming platform for 500+ university students, featuring role-based access control, Codeforces integration, and real-time leaderboards. Built to centralize practice, track progress, and foster a competitive CP community."
+thumbnail: "/content/projects/lu-cp-archive/data/thumbnail.png"
+techstack:
+  [
+    { title: "Next", icon: "nextjs" },
+    { title: "TypeScript", icon: "typescript" },
+    { title: "PostgreSQL", icon: "postgresql" },
+    { title: "Tailwind", icon: "tailwind" },
+    { title: "Prisma", icon: "prisma" },
+  ]
+links:
+  [
+    { type: "github", url: "https://github.com/Iftekhar-Ifat/lu-cp-archive" },
+    { type: "live", url: "https://lu-cp-archive.vercel.app" },
+  ]
 order: 2
-thumbnail: "/content/blogs/first-blog/data/thumbnail.png"
-isPublished: false
+isPublished: true
 ---
+
+A comprehensive competitive programming platform that transformed how Leading University students practice algorithms and compete. Built with modern web technologies, it serves as the central hub for 500+ students to practice problems, track progress, and compete on a live leaderboard integrated with Codeforces.
+
+## Key Features
+
+- **Role-Based Access Control**: Engineered a three-tier permission system (Standard/Power/Admin) enabling safe community contributions while maintaining content quality
+- **Codeforces Integration**: Automated problem status synchronization via Codeforces API, showing solved/unsolved problems in real-time
+- **Multi-Modal Practice**: Three distinct practice modes—Topic-Wise problems, Codeforces Ladder, and Contest archives—catering to different learning styles
+- **[Live Leaderboard](https://lu-cp-archive.vercel.app/dashboard/leaderboard)**: Ranks students by Codeforces performance with optional privacy controls, driving healthy competition
+- **Progress Intelligence**: Visual tracking system with difficulty filtering and status management across all content types
+
+## How It Works
+
+1. **Onboard with GitHub**: One-click OAuth authentication via NextAuth.js
+2. **Connect Your Profile**: Link your Codeforces handle to sync performance data
+3. **Choose Your Path**: Practice by topic, climb the Codeforces difficulty ladder, or join contests
+4. **Track & Compete**: Update problem status and climb the live leaderboard
+5. **Contribute Back**: Power users review submissions; admins manage the entire ecosystem
+
+
+### Quick Start
+```bash
+git clone https://github.com/Iftekhar-Ifat/lu-cp-archive.git
+cd lu-cp-archive
+npm install
+# Configure .env.local with GitHub OAuth and PostgreSQL
+npx prisma migrate dev
+npm run dev
+```
+
+## Impact & Usage
+
+- **Active Community**: Used by Leading University's competitive programming community
+- **Open Source**: Welcoming contributions from developers university-wide
+
+## Resources
+
+- 📖 [More Details](https://lu-cp-archive.vercel.app/user-guide)
+- 💬 [Community](https://www.facebook.com/profile.php?id=61572507621970)
