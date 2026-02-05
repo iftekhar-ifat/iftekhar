@@ -166,6 +166,8 @@ export function Figure(props: ImageProps & { caption?: string }) {
         height={height ?? 0}
         className="rounded-sm"
         {...rest}
+        placeholder="blur"
+        blurDataURL="/assets/thumbnail_placeholder.png"
       />
     );
 
@@ -194,6 +196,8 @@ export function img(props: ImageProps) {
         height: "auto", // Maintains aspect ratio
       }}
       className="rounded-sm"
+      placeholder="blur"
+      blurDataURL="/assets/thumbnail_placeholder.png"
     />
   );
 }
