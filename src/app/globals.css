@@ -177,3 +177,13 @@ code {
   padding-block: 0.2rem;
   font-size: var(--text-sm) /* 0.875rem = 14px */;
 }
+
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.katex-display > .katex {
+  white-space: nowrap;
+}

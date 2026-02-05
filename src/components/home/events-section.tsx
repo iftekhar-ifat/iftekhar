@@ -37,7 +37,7 @@ const eventData: EventData[] = [
     id: 2,
     date: "Jan, 2025",
     title: "Accountant AI Released",
-    description: `Launched **[Accountant AI](https://getaccountantai.com/)**, an AI-powered financial management platform featuring automatic transaction extraction via **OCR**, project-based tracking, detailed financial reports, and document history management for organizing finances intelligently.`,
+    description: `Launched **[Accountant AI](https://getaccountantai.com/)**, an AI-powered financial management platform featuring automatic transaction extraction via OCR, project-based tracking, detailed financial reports, and document history management for organizing finances intelligently.`,
   },
   {
     id: 3,

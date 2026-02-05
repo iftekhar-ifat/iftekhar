@@ -31,7 +31,11 @@ export default async function FeaturedPublications() {
         {featuredPublicationItems.map((publication, index) => (
           <TimelineItem key={index} className="pb-4">
             <TimelineHeader>
-              <div className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
+              <div
+                className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm
+                [&_strong]:!text-inherit [&_strong]:dark:!text-inherit
+                [&_em]:!text-inherit [&_em]:dark:!text-inherit"
+              >
                 <RemoteMDX content={publication} />
               </div>
             </TimelineHeader>

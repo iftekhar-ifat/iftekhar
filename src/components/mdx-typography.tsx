@@ -94,7 +94,7 @@ export function blockquote({ children }: { children: React.ReactNode }) {
 }
 
 export function hr() {
-  return <Separator />;
+  return <Separator className="my-4" />;
 }
 
 export function a({
@@ -116,11 +116,19 @@ export function a({
 }
 
 export function strong({ children }: { children: React.ReactNode }) {
-  return <strong className="font-semibold">{children}</strong>;
+  return (
+    <strong className="font-semibold text-pink-500 dark:text-pink-400">
+      {children}
+    </strong>
+  );
 }
 
 export function em({ children }: { children: React.ReactNode }) {
-  return <em className="italic">{children}</em>;
+  return (
+    <em className="italic text-fuchsia-500 dark:text-fuchsia-400">
+      {children}
+    </em>
+  );
 }
 
 export function pre({
@@ -139,23 +147,37 @@ export function pre({
   );
 }
 
-export function Figure(props: ImageProps) {
-  const { width, height, alt } = props;
+export function Figure(props: ImageProps & { caption?: string }) {
+  const { width, height, alt, caption, src, ...rest } = props;
 
-  if (width === undefined && height === undefined) {
-    return (
+  const ImageElement =
+    width === undefined && height === undefined ? (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={props.src as string} alt={alt ?? ""} className="rounded-sm" />
+      <img
+        src={src as string}
+        alt={alt ?? "placeholder"}
+        className="rounded-sm"
+      />
+    ) : (
+      <Image
+        src={src}
+        alt={alt ?? "placeholder"}
+        width={width}
+        height={height ?? 0}
+        className="rounded-sm"
+        {...rest}
+      />
     );
-  }
+
   return (
-    <Image
-      {...props}
-      alt={alt ?? ""}
-      width={width}
-      height={0}
-      className="rounded-sm"
-    />
+    <figure className="flex flex-col items-center gap-2">
+      {ImageElement}
+      {caption && (
+        <figcaption className="text-sm italic font-semibold text-muted-foreground text-center">
+          {caption}
+        </figcaption>
+      )}
+    </figure>
   );
 }
 
@@ -163,7 +185,7 @@ export function img(props: ImageProps) {
   return (
     <Image
       {...props}
-      alt={props.alt ?? ""}
+      alt={props.alt ?? "placeholder"}
       width={0}
       height={0}
       sizes="100vw"

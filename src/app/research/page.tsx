@@ -30,7 +30,10 @@ export default async function Research() {
               Publications
             </span>
           </div>
-          <div className="text-neutral-800 dark:text-neutral-300 text-sm">
+          <div
+            className="text-muted-foreground text-sm [&_strong]:!text-inherit [&_strong]:dark:!text-inherit
+                [&_em]:!text-inherit [&_em]:dark:!text-inherit"
+          >
             {publications && <RemoteMDX content={publications.content} />}
           </div>
         </div>

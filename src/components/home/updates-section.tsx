@@ -31,7 +31,7 @@ const timelineData: TimelineData[] = [
     id: 1,
     date: "Jan 14, 2026",
     title: "Paper Accepted ✔",
-    description: `Our paper **"TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation"** has been accepted at **P2P-CV @ WACV 2026** for **Oral Presentation**. [More Info](https://tffm-module.github.io/)`,
+    description: `Our paper **TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation** has been accepted at **P2P-CV @ WACV 2026** for **Oral Presentation**. [More Info](https://tffm-module.github.io/)`,
   },
   {
     id: 2,
