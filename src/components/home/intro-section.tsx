@@ -24,8 +24,8 @@ export default function IntroSection() {
             className="font-mono text-sm text-muted-foreground"
           >
             <span>RA @Intex</span>
+            <span>RI @CCDS</span>
             <span>Working on Computer Vision</span>
-            <span>Developer </span>
           </TextLoop>
         </div>
       </div>
