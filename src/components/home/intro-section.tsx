@@ -23,8 +23,8 @@ export default function IntroSection() {
             transition={{ duration: 0.5 }}
             className="font-mono text-sm text-muted-foreground"
           >
-            <span>RA @Intex</span>
-            <span>RI @CCDS</span>
+            <span>RA @ InteX</span>
+            <span>RI @ CCDS</span>
             <span>Working on Computer Vision</span>
           </TextLoop>
         </div>
