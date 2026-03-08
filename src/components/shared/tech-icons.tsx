@@ -33,6 +33,7 @@ import {
   siJson,
   siHtml5,
   siGnubash,
+  siHuggingface,
 } from "simple-icons";
 
 const curatedIcons = {
@@ -70,6 +71,7 @@ const curatedIcons = {
   json: siJson,
   html: siHtml5,
   bash: siGnubash,
+  huggingface: siHuggingface,
 } as const;
 
 export type IconSlug = keyof typeof curatedIcons;
@@ -109,6 +111,7 @@ const aliasGroups: Record<IconSlug, string[]> = {
   json: ["json"],
   html: ["html", "html5"],
   bash: ["shell", "bash", "terminal", "command"],
+  huggingface: ["huggingface"],
 };
 
 function normalizeAlias(input: string) {
