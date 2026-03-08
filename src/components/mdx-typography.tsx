@@ -117,7 +117,7 @@ export function a({
 
 export function strong({ children }: { children: React.ReactNode }) {
   return (
-    <strong className="font-semibold text-pink-500 dark:text-pink-400">
+    <strong className="font-semibold text-teal-500 dark:text-teal-400">
       {children}
     </strong>
   );
@@ -125,7 +125,7 @@ export function strong({ children }: { children: React.ReactNode }) {
 
 export function em({ children }: { children: React.ReactNode }) {
   return (
-    <em className="italic text-fuchsia-500 dark:text-fuchsia-400">
+    <em className="italic text-emerald-500 dark:text-emerald-400">
       {children}
     </em>
   );
