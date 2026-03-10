@@ -14,7 +14,6 @@ import {
   StatusProps,
 } from "../ui/status";
 import { cn } from "@/lib/utils";
-import { ExpandableWrapper } from "../shared/expandable-wrapper";
 import RemoteMDX from "../shared/remote-mdx";
 import { ScrollArea } from "../ui/scroll-area";
 
