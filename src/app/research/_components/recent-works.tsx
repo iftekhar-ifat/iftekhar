@@ -1,3 +1,4 @@
+import { ExpandableWrapper } from "@/components/shared/expandable-wrapper";
 import RemoteMDX from "@/components/shared/remote-mdx";
 import {
   Status,
@@ -28,12 +29,19 @@ type SubmittedWork = {
 const submittedWorkData: SubmittedWork[] = [
   {
     id: 1,
+    date: "Mar 10, 2026",
+    status: "hold",
+    statusTitle: "Submitted",
+    title: "Paper Submitted",
+    description: `Submitted our extended work on TFFM to CV4Clinical @ CVPR 2026.`,
+  },
+  {
+    id: 2,
     date: "January, 2026",
     status: "ongoing",
-    statusTitle: "Accepted",
-    title:
-      "TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation",
-    description: `Our paper **"TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation"** has been accepted at **P2P-CV @ WACV 2026** for **Oral Presentation**. [More Info](https://tffm-module.github.io/)`,
+    statusTitle: "Published",
+    title: "Paper Published ✔",
+    description: `Our paper **'TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation'** is _published_ in the proceedings of **P2P-CV @ WACV 2026** _(Oral Presentation)_. [More Info](https://tffm-module.github.io/)`,
   },
   {
     id: 2,
@@ -65,35 +73,39 @@ const submittedWorkData: SubmittedWork[] = [
   },
 ];
 
-export default function SubmittedWorks() {
+export default function RecentWorks() {
   return (
-    <Timeline className="ml-4">
-      {submittedWorkData.map((item) => (
-        <TimelineItem key={item.id}>
-          <TimelineHeader>
-            <div>
-              <div className={cn("flex items-center", item.status && "gap-2")}>
-                <TimelineDate>{item.date}</TimelineDate>
-                {item.status && (
-                  <Status status={item.status}>
-                    <StatusIndicator />
-                    <StatusLabel text={item.statusTitle} />
-                  </Status>
-                )}
-              </div>
+    <ExpandableWrapper maxHeight={400}>
+      <Timeline className="ml-4">
+        {submittedWorkData.map((item) => (
+          <TimelineItem key={item.id}>
+            <TimelineHeader>
+              <div>
+                <div
+                  className={cn("flex items-center", item.status && "gap-2")}
+                >
+                  <TimelineDate>{item.date}</TimelineDate>
+                  {item.status && (
+                    <Status status={item.status}>
+                      <StatusIndicator />
+                      <StatusLabel text={item.statusTitle} />
+                    </Status>
+                  )}
+                </div>
 
-              <TimelineTitle>{item.title}</TimelineTitle>
-            </div>
-          </TimelineHeader>
-          {item.description && (
-            <TimelineDescription>
-              <div className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
-                <RemoteMDX content={item.description} />
+                <TimelineTitle>{item.title}</TimelineTitle>
               </div>
-            </TimelineDescription>
-          )}
-        </TimelineItem>
-      ))}
-    </Timeline>
+            </TimelineHeader>
+            {item.description && (
+              <TimelineDescription>
+                <div className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
+                  <RemoteMDX content={item.description} />
+                </div>
+              </TimelineDescription>
+            )}
+          </TimelineItem>
+        ))}
+      </Timeline>
+    </ExpandableWrapper>
   );
 }

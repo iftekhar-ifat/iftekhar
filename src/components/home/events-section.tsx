@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ExpandableWrapper } from "../shared/expandable-wrapper";
 import RemoteMDX from "../shared/remote-mdx";
+import { ScrollArea } from "../ui/scroll-area";
 
 type EventData = {
   id: number;
@@ -60,7 +61,7 @@ export default function EventsSection() {
       <div className="flex items-center mb-4">
         <div className="font-semibold">Events:</div>
       </div>
-      <ExpandableWrapper maxHeight={500}>
+      <ScrollArea type="always" className="h-100">
         <Timeline className="ml-4">
           {eventData.map((item) => (
             <TimelineItem key={item.id}>
@@ -91,7 +92,7 @@ export default function EventsSection() {
             </TimelineItem>
           ))}
         </Timeline>
-      </ExpandableWrapper>
+      </ScrollArea>
     </div>
   );
 }

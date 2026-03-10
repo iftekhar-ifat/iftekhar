@@ -29,28 +29,36 @@ type TimelineData = {
 const timelineData: TimelineData[] = [
   {
     id: 1,
-    date: "Jan 14, 2026",
-    title: "Paper Accepted ✔",
-    description: `Our paper **TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation** has been accepted at **P2P-CV @ WACV 2026** for **Oral Presentation**. [More Info](https://tffm-module.github.io/)`,
+    date: "Mar 10, 2026",
+    status: "hold",
+    statusTitle: "Submitted",
+    title: "Paper Submitted",
+    description: `Submitted our extended work on TFFM to CV4Clinical @ CVPR 2026.`,
   },
   {
     id: 2,
+    date: "Jan 14, 2026",
+    title: "Paper Published ✔",
+    description: `Our paper **'TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation'** is _published_ in the proceedings of **P2P-CV @ WACV 2026** _(Oral Presentation)_. [More Info](https://tffm-module.github.io/)`,
+  },
+  {
+    id: 3,
     date: "Nov 10, 2025",
     title: "Paper Accepted ✔",
     description:
       "Our paper titled **Multi-Strategy Optimization of U-Net Variants for Orthopantomogram Segmentation** has been accepted at the 4th IEEE Conference on Biomedical Engineering, Computer and Information Technology for Health 2025 (IEEE BECITHCON 2025)",
   },
   {
-    id: 3,
+    id: 4,
     date: "2025",
-    status: "ongoing",
+    status: "hold",
     statusTitle: "Ongoing",
     title:
       "National Cybersecurity Authority (NCA) Cybersecurity Research & Innovation Pioneers Grant",
     description: `Awarded the prestigious **NCA Cybersecurity Research & Innovation Pioneers Grant** by the National Cybersecurity Authority of the Kingdom of Saudi Arabia for the research proposal "Privacy-Preserving Federated Learning Platform for the Healthcare Domain".`,
   },
   {
-    id: 4,
+    id: 5,
     title: "Adversarial Attack / Defense project [InteX funded]",
     date: "Nov 1, 2025",
     status: "hold",
@@ -65,7 +73,7 @@ export default function UpdatesSection() {
       <div className="flex items-center mb-4">
         <div className="font-semibold">Updates:</div>
       </div>
-      <ExpandableWrapper maxHeight={500}>
+      <ExpandableWrapper maxHeight={400}>
         <Timeline className="ml-4">
           {timelineData.map((item) => (
             <TimelineItem key={item.id}>
