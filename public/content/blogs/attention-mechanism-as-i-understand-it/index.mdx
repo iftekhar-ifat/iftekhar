@@ -613,7 +613,7 @@ As we keep increasing the dimension, the dot product accumulates more contributi
 
 This behavior becomes very clear when we simulate it. The following script repeatedly computes dot products between random query and key vectors of increasing dimensionality and measures their variance:
 
-```python
+```python showLineNumbers
 import numpy as np
 
 np.random.seed(42)
@@ -705,7 +705,7 @@ Dividing by $\sqrt{d_k}$ strikes the right balance: it prevents vanishing gradie
 
 You can see this effect in action using the following code snippet:
 
-```python
+```python showLineNumbers
 import numpy as np
 
 np.random.seed(42)
