@@ -13,9 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Cog, Menu, Microscope, NotebookPen, Palette } from "lucide-react";
+import { Cog, Menu, Microscope, NotebookPen, Palette, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "./ui/separator";
+import { useState } from "react";
 
 const navItems = [
   { name: "Research", href: "/research", logo: Microscope },
@@ -25,6 +26,7 @@ const navItems = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -53,7 +55,7 @@ export default function Navbar() {
                     "text-sm font-medium font-mono transition-colors hover:text-primary relative",
                     isActive(item.href)
                       ? "text-foreground after:bg-primary"
-                      : "text-muted-foreground"
+                      : "text-muted-foreground",
                   )}
                 >
                   <div className="flex">
@@ -74,10 +76,29 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {/* Mobile Navigation */}
             <div className="md:hidden">
-              <DropdownMenu>
+              <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    <Menu className="h-5 w-5" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="relative h-8 w-8"
+                  >
+                    <Menu
+                      className={cn(
+                        "h-5 w-5 absolute transition-all duration-200",
+                        isOpen
+                          ? "opacity-0 rotate-90 scale-50"
+                          : "opacity-100 rotate-0 scale-100",
+                      )}
+                    />
+                    <X
+                      className={cn(
+                        "h-5 w-5 absolute transition-all duration-200",
+                        isOpen
+                          ? "opacity-100 rotate-0 scale-100"
+                          : "opacity-0 -rotate-90 scale-50",
+                      )}
+                    />
                     <span className="sr-only">Toggle menu</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -93,7 +114,7 @@ export default function Navbar() {
                           "w-full cursor-pointer",
                           isActive(item.href)
                             ? "bg-accent text-accent-foreground font-medium"
-                            : ""
+                            : "",
                         )}
                       >
                         <DropdownMenuItem className="cursor-pointer rounded-md p-1 text-foreground/80 transition-colors duration-300 hover:text-foreground focus:bg-accent focus:outline-none">
