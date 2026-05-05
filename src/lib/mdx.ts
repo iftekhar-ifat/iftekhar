@@ -151,8 +151,10 @@ export function getAllSlugs(): string[] {
   );
 }
 
-export async function getPublications(): Promise<SelectedPublicationType[]> {
-  if (!fs.existsSync(PUBLICATIONS_DIR)) return [];
+export async function getPublications(): Promise<
+  SelectedPublicationType[] | null
+> {
+  if (!fs.existsSync(PUBLICATIONS_DIR)) return null;
 
   const files = fs
     .readdirSync(PUBLICATIONS_DIR)

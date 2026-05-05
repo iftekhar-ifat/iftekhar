@@ -146,13 +146,13 @@ function PublicationCard({ pub }: { pub: SelectedPublicationType }) {
 }
 
 type SelectedPublicationsProps = {
-  publications: SelectedPublicationType[];
+  publications: SelectedPublicationType[] | null;
 };
 
 export default function SelectedPublications({
   publications,
 }: SelectedPublicationsProps) {
-  if (!publications.length) return null;
+  if (!publications) return null;
 
   return (
     <div className="font-mono">
