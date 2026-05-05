@@ -1,57 +1,39 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+import { A_STAR_ALIASES, PublicationVenueType } from "./shared/shared-types";
 import { Badge } from "./ui/badge";
 
-type PublicationTypeBadgeProps = {
-  type: "Q1" | "Q2" | "Q3" | "Q4" | "Conf." | "A*";
-  text: string;
+const resolveType = (type: string) => {
+  if (A_STAR_ALIASES.includes(type)) return "A*";
+  return type;
+};
+
+const TYPE_STYLES: Record<string, string> = {
+  Q1: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-500",
+  Q2: "bg-blue-100 dark:bg-blue-500/20 text-blue-500",
+  Q3: "bg-orange-100 dark:bg-orange-500/20 text-orange-500",
+  Q4: "bg-amber-100 dark:bg-amber-500/20 text-amber-500",
+  "Conf.": "bg-neutral-100 dark:bg-neutral-500/20 text-neutral-500",
+  "A*": "bg-red-100 dark:bg-red-500/20 text-red-500",
+  default: "bg-neutral-100 dark:bg-neutral-500/20 text-neutral-500",
 };
 
 export default function PublicationType({
   type,
   text,
-}: PublicationTypeBadgeProps) {
-  const getBgColor = () => {
-    switch (type) {
-      case "Q1":
-        return "bg-green-100 dark:bg-green-500/20";
-      case "Q2":
-        return "bg-blue-100 dark:bg-blue-500/20";
-      case "Q3":
-        return "bg-orange-100 dark:bg-orange-500/20";
-      case "Q4":
-        return "bg-amber-100 dark:bg-amber-500/20";
-      case "Conf.":
-        return "bg-neutral-100 dark:bg-neutral-500/20";
-      case "A*":
-        return "bg-red-100 dark:bg-red-500/20";
-      default:
-        return "bg-neutral-100 dark:bg-neutral-500/20";
-    }
-  };
-
-  const getTextColor = () => {
-    switch (type) {
-      case "Q1":
-        return "text-emerald-500";
-      case "Q2":
-        return "text-blue-500";
-      case "Q3":
-        return "text-orange-500";
-      case "Q4":
-        return "text-amber-500";
-      case "Conf.":
-        return "text-neutral-500";
-      case "A*":
-        return "text-red-500";
-      default:
-        return "text-neutral-500";
-    }
-  };
+  className,
+}: PublicationVenueType & { className?: string }) {
+  const resolvedType = resolveType(type);
+  const style = TYPE_STYLES[resolvedType] ?? TYPE_STYLES.default;
 
   return (
     <Badge
-      className={`pointer-events-none ${getBgColor()} ${getTextColor()} px-2 py-0.5 text-sm font-bold`}
+      className={cn(
+        "pointer-events-none px-2 py-0.5 text-sm font-bold",
+        style,
+        className,
+      )}
     >
       {text ?? type}
     </Badge>

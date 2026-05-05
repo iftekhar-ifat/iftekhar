@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ExpandableWrapper } from "../shared/expandable-wrapper";
 import RemoteMDX from "../shared/remote-mdx";
+import TimelineMDXWrapper from "../shared/shared-component";
 
 type AchievementData = {
   id: number;
@@ -36,7 +37,7 @@ const achievementData: AchievementData[] = [
   {
     id: 2,
     date: "Oct, 2024",
-    title: "IBM TechXchange Watsonx Hackathon — Top 100",
+    title: "IBM TechXchange WatsonX Hackathon — Top 100",
     description: `Achieved a **top 100 ranking** in the [IBM TechXchange Watsonx Hackathon](https://www.linkedin.com/posts/iftekhar-ifat_ibmtechxchange-hackathon-watsonx-activity-7250081248100958208-B3LT), earning a complimentary ticket to attend the **IBM TechXchange Conference** in Las Vegas, NV.`,
   },
   {
@@ -75,9 +76,9 @@ export default function AchievementsSection() {
               </TimelineHeader>
               {item.description && (
                 <TimelineDescription>
-                  <div className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
+                  <TimelineMDXWrapper>
                     <RemoteMDX content={item.description} />
-                  </div>
+                  </TimelineMDXWrapper>
                 </TimelineDescription>
               )}
             </TimelineItem>

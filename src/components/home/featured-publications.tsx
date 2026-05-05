@@ -1,47 +1,20 @@
-import { getFeaturedPublications } from "@/lib/mdx";
-import { notFound } from "next/navigation";
+import { getPublications } from "@/lib/mdx";
 import React from "react";
-import { Timeline, TimelineHeader, TimelineItem } from "../ui/timeline";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import RemoteMDX from "../shared/remote-mdx";
+import SelectedPublications from "@/app/research/_components/selected-publications";
 
 export default async function FeaturedPublications() {
-  const { publications } = await getFeaturedPublications();
+  const publications = await getPublications();
 
-  if (!publications) {
-    return notFound();
-  }
-
-  function extractPublications(content: string): string[] {
-    return content
-      .split(/\r?\n\r?\n/) // Split by double newlines
-      .map((item) => item.trim()) // Remove surrounding whitespace
-      .filter((item) => item.length > 0); // Remove any empty entries
-  }
-
-  const featuredPublicationItems = extractPublications(publications?.content);
+  if (!publications) return null;
 
   return (
     <div className="font-mono max-w-full">
       <div className="flex items-center mb-4">
         <div className="font-semibold">Featured Publications:</div>
       </div>
-      <Timeline className="ml-4">
-        {featuredPublicationItems.map((publication, index) => (
-          <TimelineItem key={index} className="pb-4">
-            <TimelineHeader>
-              <div
-                className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm
-                [&_strong]:!text-inherit [&_strong]:dark:!text-inherit
-                [&_em]:!text-inherit [&_em]:dark:!text-inherit"
-              >
-                <RemoteMDX content={publication} />
-              </div>
-            </TimelineHeader>
-          </TimelineItem>
-        ))}
-      </Timeline>
+      <SelectedPublications publications={publications} />
       <div className="mt-4 w-fit justify-self-end transition-all duration-300 flex justify-end text-muted-foreground hover:underline group">
         <Link className="flex" href="/research">
           <span>see more</span>

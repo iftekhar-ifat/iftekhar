@@ -1,5 +1,6 @@
 import { ExpandableWrapper } from "@/components/shared/expandable-wrapper";
 import RemoteMDX from "@/components/shared/remote-mdx";
+import TimelineMDXWrapper from "@/components/shared/shared-component";
 import {
   Status,
   StatusIndicator,
@@ -37,14 +38,6 @@ const submittedWorkData: SubmittedWork[] = [
   },
   {
     id: 2,
-    date: "January, 2026",
-    status: "ongoing",
-    statusTitle: "Published",
-    title: "Paper Published ✔",
-    description: `Our paper **'TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation'** is _published_ in the proceedings of **P2P-CV @ WACV 2026** _(Oral Presentation)_. [More Info](https://tffm-module.github.io/)`,
-  },
-  {
-    id: 2,
     date: "November, 2025",
     status: "ongoing",
     statusTitle: "Accepted",
@@ -52,7 +45,6 @@ const submittedWorkData: SubmittedWork[] = [
       "Multi-Strategy Optimization of U-Net Variants for Orthopantomogram Segmentation",
     description: `Our paper titled **Multi-Strategy Optimization of U-Net Variants for Orthopantomogram Segmentation** has been accepted at the 4th IEEE Conference on Biomedical Engineering, Computer and Information Technology for Health 2025 (IEEE BECITHCON 2025)`,
   },
-
   {
     id: 3,
     title:
@@ -98,9 +90,9 @@ export default function RecentWorks() {
             </TimelineHeader>
             {item.description && (
               <TimelineDescription>
-                <div className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
+                <TimelineMDXWrapper>
                   <RemoteMDX content={item.description} />
-                </div>
+                </TimelineMDXWrapper>
               </TimelineDescription>
             )}
           </TimelineItem>

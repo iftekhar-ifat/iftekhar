@@ -3,6 +3,8 @@ import path from "path";
 import matter from "gray-matter";
 import { IconSlug } from "@/components/shared/tech-icons";
 import { visit } from "unist-util-visit";
+import { PublicationVenueType } from "@/components/shared/shared-types";
+import { SelectedPublicationType } from "@/app/research/_components/selected-publications";
 
 export type BlogMetadata = {
   title: string;
@@ -32,6 +34,10 @@ export type ProjectMetadata = {
 const BLOG_ROOT = path.join(process.cwd(), "public/content/blogs");
 const RESEARCH_ROOT = path.join(process.cwd(), "public/content/research");
 const PROJECT_ROOT = path.join(process.cwd(), "public/content/projects");
+const PUBLICATIONS_DIR = path.join(
+  process.cwd(),
+  "public/content/research/publications",
+);
 
 // Utility to find all blog folders containing index.mdx
 function getBlogFolders(root: string): string[] {
@@ -63,7 +69,7 @@ export async function getAllBlogsMetadata(): Promise<BlogMetadata[] | null> {
         thumbnail: data.thumbnail,
         slug,
       };
-    })
+    }),
   );
 
   // Filter out nulls and sort latest first
@@ -71,7 +77,7 @@ export async function getAllBlogsMetadata(): Promise<BlogMetadata[] | null> {
     .filter((blog): blog is BlogMetadata => !!blog)
     .sort(
       (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
     );
 }
 
@@ -103,19 +109,19 @@ export async function getFeaturedBlogsMetadata(): Promise<
         thumbnail: data.thumbnail,
         slug,
       };
-    })
+    }),
   );
 
   return blogs
     .filter((blog): blog is BlogMetadata => !!blog)
     .sort(
       (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
     );
 }
 
 export async function getBlogBySlug(
-  slug: string
+  slug: string,
 ): Promise<{ content: string; metadata: BlogMetadata } | null> {
   const folderPath = path.join(BLOG_ROOT, slug);
   const indexMd = path.join(folderPath, "index.mdx");
@@ -141,37 +147,52 @@ export async function getBlogBySlug(
 
 export function getAllSlugs(): string[] {
   return getBlogFolders(BLOG_ROOT).map((folderPath) =>
-    path.basename(folderPath)
+    path.basename(folderPath),
   );
 }
 
-export async function getResearchContent() {
-  try {
-    const publicationsPath = path.join(RESEARCH_ROOT, "publications.mdx");
+export async function getPublications(): Promise<SelectedPublicationType[]> {
+  if (!fs.existsSync(PUBLICATIONS_DIR)) return [];
 
-    const [publicationsContent] = await Promise.all([
-      fs.promises.readFile(publicationsPath, "utf8").catch(() => null),
-    ]);
+  const files = fs
+    .readdirSync(PUBLICATIONS_DIR)
+    .filter((f) => f.endsWith(".mdx"));
+
+  const publications = files.map((filename) => {
+    const raw = fs.readFileSync(path.join(PUBLICATIONS_DIR, filename), "utf-8");
+    const { data, content } = matter(raw);
 
     return {
-      publications: publicationsContent
-        ? matter(publicationsContent)
-        : matter("No publication available"),
-    };
-  } catch (error) {
-    console.error("Error reading research content:", error);
-    return {
-      publications: null,
-      ongoing: null,
-    };
-  }
+      id: data.id ?? filename.replace(/\.mdx?$/, ""),
+      title: data.title as string,
+      authors: (data.authors ?? []).map(
+        (a: { name: string; highlighted?: boolean }) => ({
+          name: a.name,
+          isHighlighted: a.highlighted ?? false,
+        }),
+      ),
+      venue: data.venue as string,
+      venueType: data.venueType as PublicationVenueType["type"] | undefined,
+      venueText: data.venueText as string | undefined,
+      year: data.year as number,
+      award: data.award as string | undefined,
+      thumbnail: data.thumbnail as string | undefined,
+      tldr: content.trim() || undefined,
+      link: data.link ?? "#",
+      _order: data.order ?? 999,
+    } satisfies SelectedPublicationType & { _order: number };
+  });
+
+  return publications
+    .sort((a, b) => a._order - b._order || b.year - a.year)
+    .map(({ _order, ...pub }) => pub);
 }
 
 export async function getFeaturedPublications() {
   try {
     const publicationsPath = path.join(
       RESEARCH_ROOT,
-      "featured-publications.mdx"
+      "featured-publications.mdx",
     );
 
     const publicationsContent = await fs.promises
@@ -216,7 +237,7 @@ export async function getAllProjectsMetadata(): Promise<
         techstack: data.techstack,
         slug,
       };
-    })
+    }),
   );
 
   return projects
@@ -225,7 +246,7 @@ export async function getAllProjectsMetadata(): Promise<
 }
 
 export async function getProjectBySlug(
-  slug: string
+  slug: string,
 ): Promise<{ content: string; metadata: ProjectMetadata } | null> {
   const folderPath = path.join(PROJECT_ROOT, slug);
   const indexMd = path.join(folderPath, "index.mdx");

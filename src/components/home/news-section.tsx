@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import RemoteMDX from "../shared/remote-mdx";
 import { ScrollArea } from "../ui/scroll-area";
 import newsData from "@/assets/news-data.json";
+import TimelineMDXWrapper from "../shared/shared-component";
 
 type NewsData = {
   id: number;
@@ -55,9 +56,9 @@ export default function NewsSection() {
               </TimelineHeader>
               {item.description && (
                 <TimelineDescription>
-                  <div className="[&_p]:!mt-0 [&_p]:!mb-0 !bg-background !text-muted-foreground !font-mono !text-sm">
+                  <TimelineMDXWrapper>
                     <RemoteMDX content={item.description} />
-                  </div>
+                  </TimelineMDXWrapper>
                 </TimelineDescription>
               )}
             </TimelineItem>
