@@ -34,6 +34,8 @@ import {
   siHtml5,
   siGnubash,
   siHuggingface,
+  siGooglescholar,
+  siX,
 } from "simple-icons";
 
 const curatedIcons = {
@@ -72,6 +74,8 @@ const curatedIcons = {
   html: siHtml5,
   bash: siGnubash,
   huggingface: siHuggingface,
+  scholar: siGooglescholar,
+  twitter_x: siX,
 } as const;
 
 export type IconSlug = keyof typeof curatedIcons;
@@ -112,6 +116,8 @@ const aliasGroups: Record<IconSlug, string[]> = {
   html: ["html", "html5"],
   bash: ["shell", "bash", "terminal", "command"],
   huggingface: ["huggingface"],
+  scholar: ["scholar", "google-scholar"],
+  twitter_x: ["twitter", "x"],
 };
 
 function normalizeAlias(input: string) {
@@ -161,6 +167,7 @@ export default function TechIcons({ item, size = 16 }: IconsProps) {
     "github",
     "prisma",
     "json",
+    "twitter_x",
   ];
 
   return (

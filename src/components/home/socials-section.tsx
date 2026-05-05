@@ -17,6 +17,8 @@ const USER_DATA = {
   email: "iftekharifat007@gmail.com",
   linkedin: "iftekhar-ifat",
   github: "Iftekhar-Ifat",
+  scholar: "Google Scholar",
+  x: "@_ifte",
 };
 
 export default function SocialSection() {
@@ -81,6 +83,32 @@ export default function SocialSection() {
           className="hover:underline"
         >
           {USER_DATA.github}
+        </a>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="border rounded p-2">
+          <TechIcons item="scholar" />
+        </div>
+        <a
+          href="https://scholar.google.com/citations?user=SGT-GUgAAAAJ&hl=en"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          {USER_DATA.scholar}
+        </a>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="border rounded p-2">
+          <TechIcons item="twitter" />
+        </div>
+        <a
+          href="https://x.com/_ifte"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          {USER_DATA.x}
         </a>
       </div>
     </div>
