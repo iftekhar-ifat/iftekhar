@@ -1,7 +1,7 @@
 import React from "react";
 import { TextLoop } from "../ui/text-loop";
 import Image from "next/image";
-import ProfileImg from "@/assets/profile.png";
+import ProfileImg from "@/assets/profile.jpg";
 
 export default function IntroSection() {
   return (
