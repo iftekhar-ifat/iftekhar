@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import authorImage from "@/assets/profile.png";
+import authorImage from "@/assets/profile.jpg";
 import { Metadata } from "next";
 import { cache, Suspense } from "react";
 import Loading from "@/app/loading";
