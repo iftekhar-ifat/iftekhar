@@ -10,7 +10,6 @@ import {
   siTensorflow,
   siPytorch,
   siNestjs,
-  siPython,
   siMeta,
   siPostgresql,
   siMysql,
@@ -36,10 +35,34 @@ import {
   siHuggingface,
   siGooglescholar,
   siX,
+  siElectronbuilder,
+  siElectron,
 } from "simple-icons";
 
-const curatedIcons = {
-  python: siPython,
+import {
+  TanStack,
+  Python,
+  OpenAIDark,
+  OpenAILight,
+} from "@ridemountainpig/svgl-react";
+import { cn } from "@/lib/utils";
+
+type SimpleIcon = { hex: string; title: string; path: string };
+
+type SvglIcon = React.ComponentType<{
+  width?: number;
+  height?: number;
+  className?: string;
+}>;
+
+type IconEntry = SimpleIcon | SvglIcon;
+
+function isSvglIcon(icon: IconEntry): icon is SvglIcon {
+  return typeof icon === "function";
+}
+
+const curatedIcons: Record<string, IconEntry> = {
+  python: Python,
   typescript: siTypescript,
   javascript: siJavascript,
   react: siReact,
@@ -76,11 +99,15 @@ const curatedIcons = {
   huggingface: siHuggingface,
   scholar: siGooglescholar,
   twitter_x: siX,
+  electron: siElectron,
+  electronBuilder: siElectronbuilder,
+  tanstack: TanStack,
+  openAI: OpenAILight,
 } as const;
 
 export type IconSlug = keyof typeof curatedIcons;
 
-const aliasGroups: Record<IconSlug, string[]> = {
+const aliasGroups: Record<string, string[]> = {
   python: ["py", "python"],
   typescript: ["ts", "typescript"],
   javascript: ["js", "javascript"],
@@ -118,6 +145,10 @@ const aliasGroups: Record<IconSlug, string[]> = {
   huggingface: ["huggingface"],
   scholar: ["scholar", "google-scholar"],
   twitter_x: ["twitter", "x"],
+  electron: ["electron"],
+  electronBuilder: ["electron-builder"],
+  tanstack: ["tanstack"],
+  openAI: ["open-ai"],
 };
 
 function normalizeAlias(input: string) {
@@ -126,22 +157,29 @@ function normalizeAlias(input: string) {
     .replace(/[^a-z0-9]+/g, "_");
 }
 
-// Build a flattened alias lookup from aliasGroups — maintain aliases in one place only.
 const aliases: Record<string, IconSlug> = {};
 Object.entries(aliasGroups).forEach(([slug, names]) => {
-  // ensure the slug itself is resolvable
   aliases[normalizeAlias(slug)] = slug as IconSlug;
-
   names.forEach((name) => {
     const n = normalizeAlias(name);
     aliases[n] = slug as IconSlug;
-    // also register the raw name (in case callers don't normalize)
     aliases[String(name).toLowerCase()] = slug as IconSlug;
   });
 });
 
+const invertedIcons: IconSlug[] = [
+  "nextjs",
+  "express",
+  "numpy",
+  "pandas",
+  "github",
+  "prisma",
+  "json",
+  "twitter_x",
+  "openAI",
+];
+
 type IconsProps = {
-  // accept either a canonical IconSlug or a free-form string alias
   item: IconSlug | string;
   size?: number;
 };
@@ -151,35 +189,33 @@ export const SUPPORTED_ICON_SLUGS = Object.keys(curatedIcons) as IconSlug[];
 export default function TechIcons({ item, size = 16 }: IconsProps) {
   const rawKey = String(item ?? "");
   const key = normalizeAlias(rawKey);
+  const slug = (aliases[key] ?? key) as IconSlug;
+  const icon = curatedIcons[slug];
 
-  const slug = aliases[key] ?? (key as IconSlug);
-  const icon = curatedIcons[slug as IconSlug];
+  if (!icon) return null;
 
-  if (!icon) {
-    return null;
+  if (isSvglIcon(icon)) {
+    const SvglComponent = icon;
+    const isInverted = invertedIcons.includes(slug);
+    return (
+      <span
+        className={cn(
+          "inline-flex shrink-0 overflow-hidden",
+          isInverted && "[&>svg]:fill-current",
+        )}
+        style={{ width: size, height: size }}
+      >
+        <SvglComponent />
+      </span>
+    );
   }
-
-  const invertedIcons: IconSlug[] = [
-    "nextjs",
-    "express",
-    "numpy",
-    "pandas",
-    "github",
-    "prisma",
-    "json",
-    "twitter_x",
-  ];
 
   return (
     <svg
       role="img"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-      fill={
-        invertedIcons.includes(slug as IconSlug)
-          ? `currentColor`
-          : `#${icon.hex}`
-      }
+      fill={invertedIcons.includes(slug) ? "currentColor" : `#${icon.hex}`}
       style={{ width: size, height: size }}
     >
       <title>{icon.title}</title>
