@@ -32,7 +32,6 @@ import {
   siJson,
   siHtml5,
   siGnubash,
-  siHuggingface,
   siGooglescholar,
   siX,
   siElectronbuilder,
@@ -42,7 +41,7 @@ import {
 import {
   TanStack,
   Python,
-  OpenAIDark,
+  HuggingFace,
   OpenAILight,
 } from "@ridemountainpig/svgl-react";
 import { cn } from "@/lib/utils";
@@ -96,7 +95,7 @@ const curatedIcons: Record<string, IconEntry> = {
   json: siJson,
   html: siHtml5,
   bash: siGnubash,
-  huggingface: siHuggingface,
+  huggingface: HuggingFace,
   scholar: siGooglescholar,
   twitter_x: siX,
   electron: siElectron,

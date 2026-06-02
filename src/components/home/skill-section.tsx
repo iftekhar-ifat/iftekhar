@@ -23,6 +23,7 @@ export default function SkillSection() {
       { title: "NumPy", icon: "numpy" },
       { title: "Pandas", icon: "pandas" },
       { title: "TensorFlow", icon: "tensorflow" },
+      { title: "HuggingFace", icon: "huggingface" },
     ],
     web_dev: [
       { title: "React", icon: "react" },
@@ -34,6 +35,7 @@ export default function SkillSection() {
       { title: "Nest", icon: "nestjs" },
       { title: "Zod", icon: "zod" },
       { title: "ReactQuery", icon: "react_query" },
+      { title: "Tanstack", icon: "tanstack" },
     ],
     misc: [
       { title: "PostgreSQL", icon: "postgres" },
@@ -57,7 +59,7 @@ export default function SkillSection() {
           <TimelineDescription className="mt-2 flex flex-wrap gap-2">
             {skills.ai_ml.map((skill) => (
               <TechStackBadge
-                className="bg-card text-muted-foreground"
+                className="bg-card"
                 key={skill.title}
                 title={skill.title}
                 icon={skill.icon}
@@ -73,7 +75,7 @@ export default function SkillSection() {
           <TimelineDescription className="mt-2 flex flex-wrap gap-2">
             {skills.web_dev.map((skill) => (
               <TechStackBadge
-                className="bg-card text-muted-foreground"
+                className="bg-card"
                 key={skill.title}
                 title={skill.title}
                 icon={skill.icon}
@@ -89,7 +91,7 @@ export default function SkillSection() {
           <TimelineDescription className="mt-2 flex flex-wrap gap-2">
             {skills.misc.map((skill) => (
               <TechStackBadge
-                className="bg-card text-muted-foreground"
+                className="bg-card"
                 key={skill.title}
                 title={skill.title}
                 icon={skill.icon}

@@ -30,11 +30,11 @@ type SubmittedWork = {
 const submittedWorkData: SubmittedWork[] = [
   {
     id: 1,
-    date: "Mar 10, 2026",
+    date: "May 25, 2026",
     status: "hold",
     statusTitle: "Submitted",
     title: "Paper Submitted",
-    description: `Submitted our extended work on TFFM to CV4Clinical @ CVPR 2026.`,
+    description: `Submitted our work **Do LLM Agents Respect Therapeutic Boundaries? Evaluating Cross-System Drug Substitution Hallucination** on _EMNLP_`,
   },
   {
     id: 2,

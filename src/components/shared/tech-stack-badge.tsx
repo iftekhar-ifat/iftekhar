@@ -18,7 +18,7 @@ export default function TechStackBadge({
       className={cn("px-1 text-sm flex items-center gap-1", className)}
     >
       <TechIcons item={icon} size={16} />
-      {title}
+      <span className="text-muted-foreground">{title}</span>
     </Badge>
   );
 }
