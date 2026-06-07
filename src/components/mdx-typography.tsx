@@ -15,7 +15,7 @@ import {
 
 export function h1({ children }: { children: React.ReactNode }) {
   return (
-    <h1 className="font-semibold text-3xl leading-9 tracking-tight lg:text-4xl lg:leading-[2.75rem] lg:tracking-tight mt-10 lg:mt-11 mb-2 lg:mb-2.5 first:mt-0">
+    <h1 className="font-semibold text-3xl leading-9 tracking-tight lg:text-4xl lg:leading-11 lg:tracking-tight mt-10 lg:mt-11 mb-2 lg:mb-2.5 first:mt-0">
       {children}
     </h1>
   );

@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-black/[0.1] bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60 dark:border-white/[0.1]">
+    <footer className="w-full border-t border-black/10 bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60 dark:border-white/10">
       <MaxWidthWrapper>
         <div className="flex h-16 items-center justify-between px-4 md:px-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
