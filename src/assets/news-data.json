@@ -1,12 +1,18 @@
 [
   {
     "id": 1,
+    "date": "June 04, 2026",
+    "title": "Paper Accepted ✔",
+    "description": "Our paper titled **Adversarial Vulnerability and Robustness of Deep Learning Models for Panoramic Dental X-ray Segmentation** has been accepted at **Scientific Reports** journal"
+  },
+  {
+    "id": 2,
     "date": "June 01, 2026",
     "title": "TICS Released",
     "description": "Released **Tics — Text·Image·Context·Search**, A local-first, privacy-focused desktop app for searching your personal image library using natural language, a reference image, or both combined. [More Info](https://iftekhar.vercel.app/projects/tics)"
   },
   {
-    "id": 2,
+    "id": 3,
     "date": "May 25, 2026",
     "status": "hold",
     "statusTitle": "Submitted",
@@ -14,24 +20,16 @@
     "description": "Submitted our work **Do LLM Agents Respect Therapeutic Boundaries? Evaluating Cross-System Drug Substitution Hallucination** on _EMNLP_"
   },
   {
-    "id": 3,
+    "id": 4,
     "date": "Jan 14, 2026",
     "title": "Paper Published ✔",
     "description": "Our paper **'TFFM: Topology-Aware Feature Fusion Module via Latent Graph Reasoning for Retinal Vessel Segmentation'** is _published_ in the proceedings of **P2P-CV @ WACV 2026** _(Oral Presentation)_. [More Info](https://tffm-module.github.io/)"
   },
   {
-    "id": 4,
+    "id": 5,
     "date": "Nov 10, 2025",
     "title": "Paper Accepted ✔",
     "description": "Our paper titled **Multi-Strategy Optimization of U-Net Variants for Orthopantomogram Segmentation** has been accepted at the 4th IEEE Conference on Biomedical Engineering, Computer and Information Technology for Health 2025 (IEEE BECITHCON 2025)"
-  },
-  {
-    "id": 5,
-    "date": "Nov 1, 2025",
-    "status": "hold",
-    "statusTitle": "Submitted",
-    "title": "Adversarial Attack / Defense Project [InteX Funded]",
-    "description": "Completed the [InteX](https://www.intexlab.net/) funded research project focusing on **adversarial attack/defense**. Submitted the manuscript on **Scientific Reports**"
   },
   {
     "id": 6,

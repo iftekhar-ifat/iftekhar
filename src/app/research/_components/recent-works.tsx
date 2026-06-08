@@ -30,6 +30,15 @@ type SubmittedWork = {
 const submittedWorkData: SubmittedWork[] = [
   {
     id: 1,
+    title:
+      "Adversarial Vulnerability and Robustness of Deep Learning Models for Panoramic Dental X-ray Segmentation",
+    date: "June 04, 2026",
+    status: "ongoing",
+    statusTitle: "Accepted",
+    description: `Our research work on **Adversarial Vulnerability and Robustness of Deep Learning Models for Panoramic Dental X-ray Segmentation** has been accepted at **Scientific Reports** journal`,
+  },
+  {
+    id: 2,
     date: "May 25, 2026",
     status: "hold",
     statusTitle: "Submitted",
@@ -37,22 +46,13 @@ const submittedWorkData: SubmittedWork[] = [
     description: `Submitted our work **Do LLM Agents Respect Therapeutic Boundaries? Evaluating Cross-System Drug Substitution Hallucination** on _EMNLP_`,
   },
   {
-    id: 2,
+    id: 3,
     date: "November, 2025",
     status: "ongoing",
     statusTitle: "Accepted",
     title:
       "Multi-Strategy Optimization of U-Net Variants for Orthopantomogram Segmentation",
     description: `Our paper titled **Multi-Strategy Optimization of U-Net Variants for Orthopantomogram Segmentation** has been accepted at the 4th IEEE Conference on Biomedical Engineering, Computer and Information Technology for Health 2025 (IEEE BECITHCON 2025)`,
-  },
-  {
-    id: 3,
-    title:
-      "Improving Adversarial Robustness of U-Net for Dental X-Ray Segmentation via Mixed Attack Training",
-    date: "November, 2025",
-    status: "hold",
-    statusTitle: "Under Review",
-    description: `Completed the [InteX](https://www.intexlab.net/) funded research project focusing on **adversarial attack/defense**. Submitted the manuscript on **Scientific Reports**`,
   },
   {
     id: 4,
