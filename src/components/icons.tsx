@@ -32,6 +32,18 @@ export const Icons = {
       <circle cx="320" cy="192" r="128" fill="#f42a41" />
     </svg>
   ),
+  finlandFlag: (props: LucideProps) => (
+    <svg
+      {...props}
+      width="1800"
+      height="1100"
+      viewBox="0 0 18 11"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="18" height="11" fill="#fff" />
+      <path d="M0,5.5h18M6.5,0v11" stroke="#002F6C" stroke-width="3" />
+    </svg>
+  ),
   linkedin: (props: LucideProps) => (
     <svg
       {...props}

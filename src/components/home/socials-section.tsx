@@ -10,9 +10,9 @@ import {
 import TechIcons from "../shared/tech-icons";
 
 const USER_DATA = {
-  working: "Working on computer vision",
-  location: "Sylhet, Bangladesh",
-  timezone: "Asia/Dhaka",
+  working: "MSc @ Uni Of Helsinki (Data Science)",
+  location: "Helsinki, Finland",
+  timezone: "Europe/Helsinki",
   phone: "+8801782565398",
   email: "iftekharifat007@gmail.com",
   linkedin: "iftekhar-ifat",
@@ -36,7 +36,7 @@ export default function SocialSection() {
         </div>
         <div className="flex items-center space-x-2">
           <span>{USER_DATA.location}</span>
-          <Icons.bgFlag className="w-6 h-6" />
+          <Icons.finlandFlag className="w-6 h-6" />
         </div>
       </div>
       <div className="flex items-center space-x-3">
