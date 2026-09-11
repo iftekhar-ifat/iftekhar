@@ -23,7 +23,7 @@ export default function IntroSection() {
             transition={{ duration: 0.5 }}
             className="font-mono text-sm text-muted-foreground"
           >
-            <span>Data Science MSc @ University of Helsinki</span>
+            <span>AI Engineer | Full Stack Dev</span>
             <span>RA @ InteX</span>
             <span>RI @ CCDS</span>
           </TextLoop>
