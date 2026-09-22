@@ -43,6 +43,9 @@ import {
   Python,
   HuggingFace,
   OpenAILight,
+  AmazonWebServicesDark,
+  AmazonWebServicesLight,
+  OpenAIDark,
 } from "@ridemountainpig/svgl-react";
 import { cn } from "@/lib/utils";
 
@@ -101,7 +104,8 @@ const curatedIcons: Record<string, IconEntry> = {
   electron: siElectron,
   electronBuilder: siElectronbuilder,
   tanstack: TanStack,
-  openAI: OpenAILight,
+  openAI: OpenAIDark,
+  aws: AmazonWebServicesDark,
 } as const;
 
 export type IconSlug = keyof typeof curatedIcons;
@@ -148,6 +152,7 @@ const aliasGroups: Record<string, string[]> = {
   electronBuilder: ["electron-builder"],
   tanstack: ["tanstack"],
   openAI: ["open-ai"],
+  aws: ["aws"],
 };
 
 function normalizeAlias(input: string) {
@@ -175,8 +180,15 @@ const invertedIcons: IconSlug[] = [
   "prisma",
   "json",
   "twitter_x",
-  "openAI",
 ];
+
+// Provide a light-mode-specific icon for a slug here. When present, that icon is
+// shown in light mode and the curated (default) icon is shown in dark mode — with
+// no color inversion. Slugs not listed here fall back to the invert behavior below.
+const lightModeIcons: Partial<Record<IconSlug, IconEntry>> = {
+  aws: AmazonWebServicesLight,
+  openAI: OpenAILight,
+};
 
 type IconsProps = {
   item: IconSlug | string;
@@ -185,22 +197,14 @@ type IconsProps = {
 
 export const SUPPORTED_ICON_SLUGS = Object.keys(curatedIcons) as IconSlug[];
 
-export default function TechIcons({ item, size = 16 }: IconsProps) {
-  const rawKey = String(item ?? "");
-  const key = normalizeAlias(rawKey);
-  const slug = (aliases[key] ?? key) as IconSlug;
-  const icon = curatedIcons[slug];
-
-  if (!icon) return null;
-
+function renderIcon(icon: IconEntry, size: number, inverted: boolean) {
   if (isSvglIcon(icon)) {
     const SvglComponent = icon;
-    const isInverted = invertedIcons.includes(slug);
     return (
       <span
         className={cn(
           "inline-flex shrink-0 overflow-hidden",
-          isInverted && "[&>svg]:fill-current",
+          inverted && "[&>svg]:fill-current",
         )}
         style={{ width: size, height: size }}
       >
@@ -214,11 +218,39 @@ export default function TechIcons({ item, size = 16 }: IconsProps) {
       role="img"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-      fill={invertedIcons.includes(slug) ? "currentColor" : `#${icon.hex}`}
+      fill={inverted ? "currentColor" : `#${icon.hex}`}
       style={{ width: size, height: size }}
     >
       <title>{icon.title}</title>
       <path d={icon.path} />
     </svg>
   );
+}
+
+export default function TechIcons({ item, size = 16 }: IconsProps) {
+  const rawKey = String(item ?? "");
+  const key = normalizeAlias(rawKey);
+  const slug = (aliases[key] ?? key) as IconSlug;
+  const icon = curatedIcons[slug];
+
+  if (!icon) return null;
+
+  const lightIcon = lightModeIcons[slug];
+
+  // If a light-mode-specific icon is provided, swap by theme instead of inverting:
+  // the light icon renders in light mode and the curated icon in dark mode.
+  if (lightIcon) {
+    return (
+      <>
+        <span className="contents dark:hidden">
+          {renderIcon(lightIcon, size, false)}
+        </span>
+        <span className="hidden dark:contents">
+          {renderIcon(icon, size, false)}
+        </span>
+      </>
+    );
+  }
+
+  return renderIcon(icon, size, invertedIcons.includes(slug));
 }

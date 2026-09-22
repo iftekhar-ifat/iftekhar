@@ -10,25 +10,36 @@ import SocialSection from "@/components/home/socials-section";
 import UpdatesSection from "@/components/home/updates-section";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { Separator } from "@/components/ui/separator";
+import OpenTo from "@/components/home/open-to";
+import EducationSection from "@/components/home/education-section";
+import ExperienceSection from "@/components/home/experience-section";
+import FeaturedProjects from "@/components/home/featured-projects";
 
 export default function Home() {
   return (
     <MaxWidthWrapper className="my-8 md:my-10">
       <div className="space-y-4">
         <IntroSection />
+        <AboutSection />
+        <OpenTo />
+        <Separator />
         <SocialSection />
         <Separator />
-        <AboutSection />
+        <EducationSection />
         <Separator />
+        <ExperienceSection />
+        <Separator />
+        <FeaturedProjects />
+        <Separator />
+        <SkillSection />
         {/* <UpdatesSection /> */}
+        {/* <EventsSection /> */}
+        <Separator />
         <NewsSection />
         <Separator />
         <FeaturedPublications />
         <Separator />
         <AchievementsSection />
-        {/* <EventsSection /> */}
-        <Separator />
-        <SkillSection />
         <Separator />
         <FeaturedBlogs />
       </div>

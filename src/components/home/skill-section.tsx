@@ -36,6 +36,7 @@ export default function SkillSection() {
       { title: "Zod", icon: "zod" },
       { title: "ReactQuery", icon: "react_query" },
       { title: "Tanstack", icon: "tanstack" },
+      { title: "AWS", icon: "aws" },
     ],
     misc: [
       { title: "PostgreSQL", icon: "postgres" },
