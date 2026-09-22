@@ -32,14 +32,14 @@ export default function Home() {
         <FeaturedProjects />
         <Separator />
         <SkillSection />
+        <Separator />
+        <AchievementsSection />
         {/* <UpdatesSection /> */}
         {/* <EventsSection /> */}
         <Separator />
-        <NewsSection />
-        <Separator />
         <FeaturedPublications />
         <Separator />
-        <AchievementsSection />
+        <NewsSection />
         <Separator />
         <FeaturedBlogs />
       </div>
