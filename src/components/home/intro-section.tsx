@@ -25,8 +25,7 @@ export default function IntroSection() {
           >
             <span>AI Engineer | Full Stack Dev</span>
             <span>MSc @ Uni of Helsinki</span>
-            <span>RA @ InteX</span>
-            <span>RI @ CCDS</span>
+            <span>Research Assistant @ InteX</span>
           </TextLoop>
         </div>
       </div>

@@ -22,7 +22,6 @@ export default function OpenTo() {
           "Research + Product",
           "LLM Applications",
           "Agentic Systems",
-          "Computer Vision",
         ].map((role) => (
           <span
             key={role}

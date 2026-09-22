@@ -12,6 +12,7 @@ import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { Separator } from "@/components/ui/separator";
 import OpenTo from "@/components/home/open-to";
 import EducationSection from "@/components/home/education-section";
+import ExperienceSection from "@/components/home/experience-section";
 import FeaturedProjects from "@/components/home/featured-projects";
 
 export default function Home() {
@@ -25,6 +26,8 @@ export default function Home() {
         <SocialSection />
         <Separator />
         <EducationSection />
+        <Separator />
+        <ExperienceSection />
         <Separator />
         <FeaturedProjects />
         <Separator />

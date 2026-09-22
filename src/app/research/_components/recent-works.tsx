@@ -43,7 +43,7 @@ const submittedWorkData: SubmittedWork[] = [
     status: "hold",
     statusTitle: "Submitted",
     title: "Paper Submitted",
-    description: `Submitted our work **Do LLM Agents Respect Therapeutic Boundaries? Evaluating Cross-System Drug Substitution Hallucination** on _EMNLP_`,
+    description: `Submitted our work **Do LLM Agents Respect Therapeutic Boundaries? Evaluating Cross-System Drug Substitution Hallucination** to _EMNLP_`,
   },
   {
     id: 3,
