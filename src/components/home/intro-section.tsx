@@ -24,6 +24,7 @@ export default function IntroSection() {
             className="font-mono text-sm text-muted-foreground"
           >
             <span>AI Engineer | Full Stack Dev</span>
+            <span>MSc @ Uni of Helsinki</span>
             <span>RA @ InteX</span>
             <span>RI @ CCDS</span>
           </TextLoop>

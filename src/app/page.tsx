@@ -10,15 +10,20 @@ import SocialSection from "@/components/home/socials-section";
 import UpdatesSection from "@/components/home/updates-section";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { Separator } from "@/components/ui/separator";
+import OpenTo from "@/components/home/open-to";
+import EducationSection from "@/components/home/education-section";
 
 export default function Home() {
   return (
     <MaxWidthWrapper className="my-8 md:my-10">
       <div className="space-y-4">
         <IntroSection />
+        <AboutSection />
+        <OpenTo />
+        <Separator />
         <SocialSection />
         <Separator />
-        <AboutSection />
+        <EducationSection />
         <Separator />
         {/* <UpdatesSection /> */}
         <NewsSection />
