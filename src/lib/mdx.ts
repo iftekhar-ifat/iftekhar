@@ -29,6 +29,7 @@ export type ProjectMetadata = {
     url: string;
   }[];
   slug: string;
+  featured?: boolean;
 };
 
 const BLOG_ROOT = path.join(process.cwd(), "public/content/blogs");
@@ -229,6 +230,42 @@ export async function getAllProjectsMetadata(): Promise<
 
       // Return null early if not published
       if (!data.isPublished) return null;
+
+      const slug = path.basename(folderPath);
+      return {
+        title: data.title,
+        description: data.description,
+        order: data.order,
+        thumbnail: data.thumbnail,
+        techstack: data.techstack,
+        slug,
+      };
+    }),
+  );
+
+  return projects
+    .filter((project): project is ProjectMetadata => !!project)
+    .sort((a, b) => a.order - b.order);
+}
+
+export async function getFeaturedProjectsMetadata(): Promise<
+  ProjectMetadata[] | null
+> {
+  const folders = getBlogFolders(PROJECT_ROOT);
+
+  const projects = await Promise.all(
+    folders.map(async (folderPath) => {
+      const indexMd = path.join(folderPath, "index.mdx");
+      if (!fs.existsSync(indexMd)) return null;
+
+      const raw = await fs.promises.readFile(indexMd, "utf8");
+      const { data } = matter(raw);
+
+      // Return null early if not published
+      if (!data.isPublished) return null;
+
+      // Return null early if not featured
+      if (!data.featured) return null;
 
       const slug = path.basename(folderPath);
       return {
