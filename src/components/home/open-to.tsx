@@ -2,7 +2,7 @@ import React from "react";
 
 export default function OpenTo() {
   return (
-    <div className="font-mono text-sm space-y-3">
+    <div className="font-mono text-sm space-y-3 rounded-lg border border-emerald-500/25 bg-emerald-500/[0.02] p-4 shadow-[0_0_18px_-4px_rgba(16,185,129,0.35)]">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">

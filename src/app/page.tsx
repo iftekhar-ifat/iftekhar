@@ -22,7 +22,6 @@ export default function Home() {
         <IntroSection />
         <AboutSection />
         <OpenTo />
-        <Separator />
         <SocialSection />
         <Separator />
         <EducationSection />
