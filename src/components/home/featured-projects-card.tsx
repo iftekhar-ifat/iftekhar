@@ -1,9 +1,14 @@
-import { getFeaturedProjectsMetadata } from "@/lib/mdx";
+import { getFeaturedProjectsMetadata, type ProjectMetadata } from "@/lib/mdx";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { Play } from "lucide-react";
+import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import TechStackBadge from "../shared/tech-stack-badge";
+
+const demoLink = (project: ProjectMetadata) =>
+  project.links?.find((link) => link.type === "demo")?.url;
 
 export default async function FeaturedProjectsCard() {
   const projects = await getFeaturedProjectsMetadata();
@@ -13,15 +18,37 @@ export default async function FeaturedProjectsCard() {
   return (
     <div className="font-mono">
       {projects.map((project) => (
-        <div key={project.slug} className="flex flex-col sm:flex-row gap-4 py-5">
-          <div className="relative shrink-0 w-full sm:w-50 h-32 rounded-md overflow-hidden bg-background">
-            <Image
-              src={project.thumbnail}
-              alt={`${project.title} thumbnail`}
-              fill
-              className="object-contain"
-              sizes="200px"
-            />
+        <div
+          key={project.slug}
+          className="flex flex-col sm:flex-row gap-4 py-5"
+        >
+          <div className="flex shrink-0 flex-col gap-2 w-full sm:w-50">
+            <div className="relative w-full h-32 rounded-md overflow-hidden bg-background">
+              <Image
+                src={project.thumbnail}
+                alt={`${project.title} thumbnail`}
+                fill
+                className="object-contain"
+                sizes="200px"
+              />
+            </div>
+            {demoLink(project) && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="font-mono text-xs text-muted-foreground hover:text-foreground"
+              >
+                <a
+                  href={demoLink(project)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Play className="h-4 w-4" />
+                  Demo
+                </a>
+              </Button>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5 min-w-0">

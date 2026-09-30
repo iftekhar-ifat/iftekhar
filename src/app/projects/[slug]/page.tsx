@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Metadata } from "next";
 import TechStackBadge from "@/components/shared/tech-stack-badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "lucide-react";
+import { Link, Play } from "lucide-react";
 import TechIcons from "@/components/shared/tech-icons";
 import RemoteMDX from "@/components/shared/remote-mdx";
 
@@ -14,6 +14,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const linksIconMap = {
   github: <TechIcons item="github" />,
   live: <Link />,
+  demo: <Play />,
 };
 
 export async function generateMetadata({

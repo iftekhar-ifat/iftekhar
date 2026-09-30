@@ -25,7 +25,7 @@ export type ProjectMetadata = {
     icon: IconSlug;
   }[];
   links: {
-    type: "github" | "live";
+    type: "github" | "live" | "demo";
     url: string;
   }[];
   slug: string;
@@ -274,6 +274,7 @@ export async function getFeaturedProjectsMetadata(): Promise<
         order: data.order,
         thumbnail: data.thumbnail,
         techstack: data.techstack,
+        links: data.links,
         slug,
       };
     }),
