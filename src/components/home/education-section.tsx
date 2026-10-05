@@ -32,7 +32,7 @@ const educationData: EducationData[] = [
     logo: LeadingUniversityLogo,
     date: "Jan. 2020 – Jan. 2024",
     location: "Sylhet, Bangladesh",
-    description: `CGPA 3.53 / 4.00 | Thesis on skin-cancer classification, published in **IEEE Access (Q1)**.`,
+    description: `Thesis on skin-cancer classification, published in **IEEE Access (Q1)**.`,
   },
 ];
 
