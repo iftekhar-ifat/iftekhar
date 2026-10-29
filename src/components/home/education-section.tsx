@@ -45,11 +45,12 @@ export default function EducationSection() {
       <div className="space-y-6">
         {educationData.map((item) => (
           <div key={item.id} className="flex gap-3">
-            <div className="shrink-0 h-fit border rounded-md p-1.5 bg-white">
+            <div className="relative shrink-0 self-start size-11 border rounded-md bg-white overflow-hidden">
               <Image
                 src={item.logo}
                 alt={item.institution}
-                className="h-7 w-auto object-contain"
+                fill
+                className="object-contain p-1"
               />
             </div>
             <div className="flex-1">

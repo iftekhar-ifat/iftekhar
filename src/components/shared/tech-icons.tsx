@@ -36,6 +36,7 @@ import {
   siX,
   siElectronbuilder,
   siElectron,
+  siNasa,
 } from "simple-icons";
 
 import {
@@ -43,6 +44,7 @@ import {
   Python,
   HuggingFace,
   OpenAILight,
+  IBM,
   AmazonWebServicesDark,
   AmazonWebServicesLight,
   OpenAIDark,
@@ -106,6 +108,8 @@ const curatedIcons: Record<string, IconEntry> = {
   tanstack: TanStack,
   openAI: OpenAIDark,
   aws: AmazonWebServicesDark,
+  ibm: IBM,
+  nasa: siNasa,
 } as const;
 
 export type IconSlug = keyof typeof curatedIcons;
@@ -152,6 +156,8 @@ const aliasGroups: Record<string, string[]> = {
   electronBuilder: ["electron-builder"],
   tanstack: ["tanstack"],
   openAI: ["open-ai"],
+  ibm: ["ibm"],
+  nasa: ["nasa"],
   aws: ["aws"],
 };
 

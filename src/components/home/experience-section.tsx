@@ -58,10 +58,10 @@ export default function ExperienceSection() {
                   src={item.logo}
                   alt={item.company}
                   fill
-                  className="object-contain p-1.5"
+                  className="object-contain p-1"
                 />
               ) : (
-                <Building2 className="h-6 w-6 text-neutral-500" />
+                <Building2 className="h-7 w-7 text-neutral-500" />
               )}
             </div>
             <div className="flex-1">
