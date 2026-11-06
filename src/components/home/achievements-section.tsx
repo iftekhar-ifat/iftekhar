@@ -23,7 +23,7 @@ const achievementData: AchievementData[] = [
     title: "NCA Cybersecurity Research & Innovation Pioneers Grant",
     issuer: "National Cybersecurity Authority (NCA), Saudi Arabia",
     logo: "/assets/nca-logo.png",
-    description: `Awarded the prestigious **NCA Cybersecurity Research & Innovation Pioneers Grant** by the **National Cybersecurity Authority of the Kingdom of Saudi Arabia** for the research proposal "Privacy-Preserving Federated Learning Platform for the Healthcare Domain".`,
+    description: `Awarded the prestigious **[NCA Cybersecurity Research & Innovation Pioneers Grant](https://nca.gov.sa/en/innovation-and-investment/cybersecurity-research/)** by the **National Cybersecurity Authority of the Kingdom of Saudi Arabia** for the research proposal "Privacy-Preserving Federated Learning Platform for the Healthcare Domain".`,
   },
   {
     id: 2,

@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import OpenTo from "@/components/home/open-to";
 import EducationSection from "@/components/home/education-section";
 import ExperienceSection from "@/components/home/experience-section";
+import ActivitySection from "@/components/home/activity-section";
 import FeaturedProjects from "@/components/home/featured-projects";
 
 export default function Home() {
@@ -39,6 +40,8 @@ export default function Home() {
         <FeaturedPublications />
         <Separator />
         <NewsSection />
+        <Separator />
+        <ActivitySection />
         <Separator />
         <FeaturedBlogs />
       </div>
