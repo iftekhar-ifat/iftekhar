@@ -16,7 +16,7 @@ export default function ActivitySection() {
         <div className="font-semibold">Activity:</div>
       </div>
       <Carousel opts={{ align: "start" }}>
-        <CarouselContent className="items-start">
+        <CarouselContent>
           {(activityData as ActivityData[]).map((post) => (
             <CarouselItem key={post.id} className="basis-[85%] sm:basis-1/2">
               <ActivityPost post={post} />

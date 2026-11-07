@@ -40,7 +40,7 @@ export default function ActivityPost({ post }: { post: ActivityData }) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex h-full flex-col gap-2">
       <div
         ref={frameRef}
         className="relative w-full overflow-hidden rounded-md"
@@ -74,7 +74,7 @@ export default function ActivityPost({ post }: { post: ActivityData }) {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="View on LinkedIn"
-        className="flex w-fit items-center gap-1 self-end text-xs text-muted-foreground transition-colors hover:text-foreground hover:underline"
+        className="mt-auto flex w-fit items-center gap-1 self-end text-xs text-muted-foreground transition-colors hover:text-foreground hover:underline"
       >
         View on
         <Icons.linkedin className="h-3.5 w-3.5" />
