@@ -21,7 +21,13 @@ const EMBED_WIDTH = 504;
 // longer posts fade out at the bottom.
 const MAX_EMBED_HEIGHT = 560;
 
-export default function ActivityPost({ post }: { post: ActivityData }) {
+export default function ActivityPost({
+  post,
+  shouldLoad,
+}: {
+  post: ActivityData;
+  shouldLoad: boolean;
+}) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.73);
   const visibleHeight = Math.min(post.height, MAX_EMBED_HEIGHT);
@@ -46,19 +52,25 @@ export default function ActivityPost({ post }: { post: ActivityData }) {
         className="relative w-full overflow-hidden rounded-md"
         style={{ height: visibleHeight * scale }}
       >
-        <iframe
-          src={embedSrc}
-          title={post.title}
-          loading="lazy"
-          scrolling="no"
-          width={EMBED_WIDTH}
-          height={post.height}
-          className="origin-top-left border-0"
-          style={{ transform: `scale(${scale})` }}
-          allowFullScreen
-        />
-        {isTruncated && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
+        {shouldLoad ? (
+          <>
+            <iframe
+              src={embedSrc}
+              title={post.title}
+              loading="lazy"
+              scrolling="no"
+              width={EMBED_WIDTH}
+              height={post.height}
+              className="origin-top-left border-0"
+              style={{ transform: `scale(${scale})` }}
+              allowFullScreen
+            />
+            {isTruncated && (
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
+            )}
+          </>
+        ) : (
+          <div className="h-full w-full animate-pulse rounded-md bg-muted" />
         )}
         <a
           href={post.postUrl}
